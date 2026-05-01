@@ -1,0 +1,16 @@
+# Raw downloaded data (regenerate with python analysis/pipeline.py)
+data/
+
+# Pipeline intermediate CSVs (regenerate with python analysis/pipeline.py)
+output/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# OS
+.DS_Store
+Thumbs.db

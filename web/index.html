@@ -1,0 +1,1737 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="index, follow">
+  <title>Vigilante de Contratación Menor — Madrid vs. Barcelona 2023–2025</title>
+  <meta name="description" content="Análisis comparativo de contratación menor municipal. Indicadores HHI, fraccionamiento LCSP y casos de estudio.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Inter:wght@300;400;500;600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    img, svg { display: block; max-width: 100%; }
+
+    :root {
+      --bg-base: #0a0a0f;
+      --bg-card: #111118;
+      --bg-elevated: #1a1a24;
+      --border: #2a2a3a;
+      --text-primary: #f0f0f5;
+      --text-secondary: #9090a8;
+      --text-muted: #55556a;
+      --accent: #f59e0b;
+      --accent-dim: #b97a0a;
+      --madrid: #f59e0b;
+      --barcelona: #4f86c6;
+      --alert: #ef4444;
+      --alert-dim: #7f1d1d;
+      --ok: #22c55e;
+
+      --font-display: "Playfair Display", Georgia, serif;
+      --font-body: "Inter", system-ui, sans-serif;
+      --font-mono: "Fira Code", "Consolas", monospace;
+
+      --space-xs: 4px; --space-sm: 8px; --space-md: 16px;
+      --space-lg: 24px; --space-xl: 40px; --space-2xl: 64px;
+      --space-3xl: 96px; --space-4xl: 140px;
+      --radius-sm: 4px; --radius-md: 8px; --radius-lg: 16px;
+      --max-prose: 720px; --max-content: 1200px;
+    }
+
+    body {
+      background: var(--bg-base);
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      font-size: 1rem;
+      line-height: 1.625;
+      overflow-x: hidden;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+    #progress-bar {
+      position: fixed; top: 0; left: 0; height: 3px; width: 0%;
+      background: var(--accent); z-index: 200;
+      transition: width 80ms linear;
+    }
+
+    .skip-link {
+      position: absolute; top: -999px; left: 8px; z-index: 999;
+      background: var(--accent); color: #000; padding: 6px 12px;
+      border-radius: var(--radius-md); font-weight: 600;
+    }
+    .skip-link:focus { top: 8px; }
+
+    #toc { display: none; position: fixed; right: 24px; top: 50%;
+      transform: translateY(-50%); z-index: 100; list-style: none; }
+    @media (min-width: 1280px) { #toc { display: block; } }
+    #toc li { margin: 8px 0; }
+    #toc a {
+      display: block; width: 8px; height: 8px; border-radius: 50%;
+      background: var(--border); transition: background 200ms, transform 200ms;
+      position: relative; cursor: pointer;
+    }
+    #toc a.active, #toc a:hover { background: var(--accent); transform: scale(1.4); }
+    #toc a[data-label]::after {
+      content: attr(data-label); position: absolute; right: 16px; top: 50%;
+      transform: translateY(-50%); font-family: var(--font-mono); font-size: 11px;
+      color: var(--text-secondary); white-space: nowrap;
+      opacity: 0; transition: opacity 150ms; pointer-events: none;
+    }
+    #toc a:hover[data-label]::after { opacity: 1; }
+
+    .section {
+      min-height: 100vh; padding: var(--space-4xl) var(--space-xl);
+      display: flex; flex-direction: column; justify-content: center;
+    }
+    .section__inner { max-width: var(--max-content); margin: 0 auto; width: 100%; }
+    .section--prose .section__inner { max-width: var(--max-prose); }
+
+    .reveal {
+      opacity: 0; transform: translateY(24px);
+      transition: opacity 600ms cubic-bezier(0.25, 1, 0.5, 1),
+                  transform 600ms cubic-bezier(0.25, 1, 0.5, 1);
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    .placeholder {
+      background: var(--bg-elevated); border: 1px dashed var(--border);
+      border-radius: var(--radius-lg); padding: var(--space-2xl);
+      text-align: center; color: var(--text-muted);
+      font-family: var(--font-mono); font-size: 0.875rem;
+    }
+
+    /* ── Section typography ─────────────────── */
+    .section-label {
+      font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--accent); margin-bottom: var(--space-sm);
+    }
+    .section-title {
+      font-family: var(--font-display); font-size: clamp(1.75rem, 3vw, 2.5rem);
+      font-weight: 700; line-height: 1.2; color: var(--text-primary);
+      margin-bottom: var(--space-xl);
+    }
+    .prose { color: var(--text-secondary); }
+    .prose p { margin-bottom: var(--space-lg); }
+    .prose h3 {
+      font-family: var(--font-display); font-size: 1.125rem; font-weight: 700;
+      color: var(--text-primary); margin: var(--space-xl) 0 var(--space-md);
+    }
+    .prose strong { color: var(--text-primary); }
+    .prose em { font-style: italic; }
+    mark.highlight {
+      background: rgba(245,158,11,0.15); color: var(--accent);
+      padding: 1px 4px; border-radius: 2px;
+    }
+    blockquote.callout {
+      border-left: 3px solid var(--accent); padding: var(--space-md) var(--space-lg);
+      background: var(--bg-card); margin: var(--space-xl) 0;
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+      font-style: italic; color: var(--text-secondary); font-size: 0.9375rem;
+    }
+    .lcsp-box {
+      background: var(--bg-elevated); border: 1px solid var(--border);
+      border-radius: var(--radius-md); padding: var(--space-lg);
+      margin-top: var(--space-xl);
+    }
+    .lcsp-tag {
+      display: inline-block; background: var(--alert-dim); color: var(--alert);
+      font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.1em;
+      text-transform: uppercase; padding: 2px 8px; border-radius: 3px;
+      margin-bottom: var(--space-sm);
+    }
+    .lcsp-box p { font-size: 0.875rem; color: var(--text-secondary); margin: 0; }
+    .lcsp-box strong { color: var(--text-primary); }
+
+    /* ── Source cards ───────────────────────── */
+    .source-cards { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-lg); margin-bottom: var(--space-xl); }
+    @media (max-width: 640px) { .source-cards { grid-template-columns: 1fr; } }
+    .source-card {
+      border-left: 4px solid; background: var(--bg-card);
+      padding: var(--space-lg); border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    }
+    .source-card--madrid { border-color: var(--madrid); }
+    .source-card--barcelona { border-color: var(--barcelona); }
+    .source-city { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px; }
+    .source-name { font-weight: 600; color: var(--text-primary); font-size: 0.9375rem; margin-bottom: var(--space-sm); }
+    .source-stats { display: flex; gap: var(--space-md); flex-wrap: wrap; margin-bottom: var(--space-sm); }
+    .source-stats span { font-family: var(--font-mono); font-size: 0.8125rem; color: var(--text-secondary); }
+    .source-stats strong { color: var(--text-primary); }
+    .source-detail { font-size: 0.8125rem; color: var(--text-muted); margin-bottom: 4px; }
+    .source-caveat { font-family: var(--font-mono); font-size: 0.75rem; color: var(--accent-dim); }
+
+    /* ── Timeline bars ──────────────────────── */
+    .timeline { margin-top: var(--space-xl); }
+    .timeline-title { font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: var(--space-md); }
+    .timeline-row { display: flex; align-items: flex-start; gap: var(--space-md); margin-bottom: var(--space-md); }
+    .timeline-year { font-family: var(--font-mono); font-size: 0.8125rem; color: var(--text-secondary); min-width: 36px; padding-top: 6px; }
+    .timeline-bar-wrap { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+    .timeline-bar {
+      height: 24px; border-radius: var(--radius-sm);
+      display: flex; align-items: center; padding: 0 var(--space-sm);
+      font-family: var(--font-mono); font-size: 0.7rem; white-space: nowrap; overflow: hidden;
+      transition: width 800ms cubic-bezier(0.25, 1, 0.5, 1);
+    }
+    .timeline-bar--mad { background: rgba(245,158,11,0.2); color: var(--accent); }
+    .timeline-bar--bcn { background: rgba(79,134,198,0.2); color: var(--barcelona); }
+    .timeline-note { font-size: 0.75rem; color: var(--text-muted); margin-top: var(--space-sm); }
+
+    /* ── Hero ───────────────────────────────── */
+    .hero-eyebrow {
+      font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.15em;
+      color: var(--accent); text-transform: uppercase; margin-bottom: var(--space-lg);
+    }
+    .hero-title {
+      font-family: var(--font-display); font-size: clamp(2.5rem, 6vw, 5rem);
+      font-weight: 900; line-height: 1.05; color: var(--text-primary);
+      margin-bottom: var(--space-md);
+    }
+    .hero-tagline {
+      font-family: var(--font-mono); font-size: 1rem;
+      color: var(--text-secondary); margin-bottom: var(--space-2xl);
+    }
+    .hero-stats {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-lg);
+      margin-bottom: var(--space-2xl);
+    }
+    @media (max-width: 640px) { .hero-stats { grid-template-columns: 1fr; } }
+    .stat-card {
+      background: var(--bg-elevated); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: var(--space-xl);
+      text-align: center;
+    }
+    .stat-card--ratio { border-color: var(--accent-dim); }
+    .stat-number {
+      font-family: var(--font-display); font-size: clamp(2.5rem, 4vw, 3.5rem);
+      font-weight: 900; color: var(--accent); line-height: 1;
+      margin-bottom: var(--space-sm);
+    }
+    .stat-label {
+      font-family: var(--font-body); font-size: 0.8125rem;
+      color: var(--text-secondary); line-height: 1.4;
+    }
+    .stat-sub { display: block; color: var(--text-muted); font-size: 0.75rem; margin-top: 2px; }
+    .hero-abstract {
+      max-width: var(--max-prose); font-size: 1.0625rem; line-height: 1.75;
+      color: var(--text-secondary); margin-bottom: var(--space-xl);
+    }
+    .hero-abstract strong { color: var(--text-primary); }
+    .hero-meta {
+      display: flex; gap: var(--space-lg); flex-wrap: wrap;
+      font-family: var(--font-mono); font-size: 0.75rem;
+      color: var(--text-muted); margin-bottom: var(--space-2xl);
+    }
+    .hero-scroll-hint {
+      display: flex; align-items: center; gap: var(--space-sm);
+      font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-muted);
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100% { opacity: 0.5; } 50% { opacity: 1; } }
+
+    /* ── Cases ──────────────────────────────── */
+    .caso-block { margin-bottom: var(--space-2xl); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-xl); background: var(--bg-card); }
+    .caso-header { display: flex; gap: var(--space-xl); margin-bottom: var(--space-lg); }
+    .caso-n { font-family: var(--font-display); font-size: 3rem; font-weight: 900; color: var(--accent); opacity: 0.3; line-height: 1; min-width: 48px; flex-shrink: 0; }
+    .caso-eyebrow { font-family: var(--font-mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); margin-bottom: 4px; }
+    .caso-title { font-family: var(--font-display); font-size: 1.375rem; font-weight: 700; color: var(--text-primary); margin-bottom: var(--space-sm); }
+    .caso-desc { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; }
+    .caso-context {
+      margin-top: var(--space-md);
+      padding: var(--space-md) var(--space-lg);
+      background: var(--bg-elevated); border-left: 2px solid var(--accent);
+      border-radius: var(--radius-sm);
+      font-size: 0.825rem; color: var(--text-secondary); line-height: 1.6;
+    }
+    .caso-context-label {
+      font-family: var(--font-mono); font-size: 0.65rem; text-transform: uppercase;
+      letter-spacing: 0.12em; color: var(--accent); display: block; margin-bottom: 6px;
+    }
+    .caso-viz { margin: var(--space-lg) 0; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden; min-height: 160px; }
+    .caso-viz svg text { font-family: "Fira Code", monospace; }
+    .caso-badges { display: flex; gap: var(--space-sm); flex-wrap: wrap; }
+    .badge { padding: 3px 10px; border-radius: 100px; font-size: 0.75rem; font-family: var(--font-mono); }
+    .badge-risk { background: var(--alert-dim); color: var(--alert); }
+    .badge-info { background: rgba(79,134,198,0.12); color: var(--barcelona); }
+    .badge-neutral { background: var(--bg-elevated); color: var(--text-secondary); }
+
+    /* ── Charts ─────────────────────────────── */
+    .chart-block { margin-bottom: var(--space-2xl); }
+    .chart-header { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: var(--space-sm); margin-bottom: var(--space-sm); }
+    .chart-title { font-family: var(--font-display); font-size: 1.125rem; font-weight: 700; color: var(--text-primary); }
+    .chart-desc { font-size: 0.875rem; color: var(--text-secondary); margin-bottom: var(--space-md); }
+    .chart-legend { display: flex; align-items: center; gap: var(--space-md); font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); }
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 4px; }
+    .legend-dot--madrid { background: var(--madrid); }
+    .legend-dot--barcelona { background: var(--barcelona); }
+    .legend-dot--obras { background: var(--alert); }
+    .legend-dot--servicios { background: var(--accent); }
+    #chart-hhi-sector, #chart-hhi-organos, #chart-frac { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
+    #chart-hhi-sector svg text, #chart-hhi-organos svg text, #chart-frac svg text { font-family: "Fira Code", monospace; }
+
+    /* ── Pipeline ───────────────────────────── */
+    .pipe-subtitle { color: var(--text-secondary); font-size: 0.9375rem; margin-bottom: var(--space-2xl); }
+    .pipeline-layout { display: grid; grid-template-columns: 160px 1fr; gap: var(--space-2xl); align-items: flex-start; }
+    @media (max-width: 768px) { .pipeline-layout { grid-template-columns: 1fr; } }
+    .pipeline-diagram { position: sticky; top: 120px; }
+    .pipeline-diagram svg { width: 100%; max-width: 160px; }
+
+    .pipe-node circle { transition: fill 400ms ease-out, stroke 400ms ease-out; }
+    .pipe-node text { transition: fill 400ms ease-out; }
+    .pipe-node.pipe-active circle { fill: #1f1508; stroke: var(--accent); filter: drop-shadow(0 0 8px rgba(245,158,11,0.3)); }
+    .pipe-node.pipe-active text { fill: var(--accent) !important; }
+    path[id^="pipe-line"] { transition: stroke 400ms ease-out; }
+    path[id^="pipe-line"].pipe-lit { stroke: var(--accent-dim); animation: drawLine 600ms ease-out forwards; }
+    @keyframes drawLine { to { stroke-dashoffset: 0; } }
+
+    .pipeline-steps { display: flex; flex-direction: column; gap: var(--space-md); }
+    .pipe-step {
+      border: 1px solid var(--border); border-radius: var(--radius-lg);
+      padding: var(--space-lg); background: var(--bg-card);
+      transition: border-color 400ms ease-out, background 400ms ease-out;
+      cursor: pointer;
+    }
+    .pipe-step.active {
+      border-color: var(--accent-dim); background: var(--bg-elevated);
+    }
+    .pipe-step-header { display: flex; gap: var(--space-md); align-items: flex-start; margin-bottom: var(--space-sm); }
+    .pipe-step-n {
+      font-family: var(--font-display); font-size: 1.5rem; font-weight: 900;
+      color: var(--text-muted); line-height: 1; min-width: 32px;
+      transition: color 400ms;
+    }
+    .pipe-step.active .pipe-step-n { color: var(--accent); }
+    .pipe-step-fn { font-family: var(--font-mono); font-size: 0.8125rem; color: var(--accent); margin-bottom: 2px; }
+    .pipe-step-title { font-weight: 600; color: var(--text-primary); font-size: 0.9375rem; }
+    .pipe-step-stat { font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-bottom: var(--space-sm); }
+    .pipe-step-detail { display: none; margin-top: var(--space-md); }
+    .pipe-step.active .pipe-step-detail { display: block; }
+
+    .pipe-mini-card { background: var(--bg-base); border: 1px solid var(--border); border-radius: var(--radius-md); padding: var(--space-md); }
+    .pipe-mini-card--alert { border-color: var(--alert-dim); }
+    .pipe-mini-label { font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: var(--space-sm); }
+    .pipe-row { display: flex; gap: var(--space-sm); margin-bottom: 4px; font-size: 0.8125rem; }
+    .pipe-k { font-family: var(--font-mono); color: var(--text-muted); min-width: 80px; flex-shrink: 0; }
+    .pipe-v { color: var(--text-secondary); }
+    .pipe-v.accent { color: var(--accent); }
+    .pipe-v.alert { color: var(--alert); font-weight: 600; }
+    .pipe-arrow { font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-muted); text-align: center; margin: var(--space-sm) 0; }
+
+    .pipe-hhi-bars { display: flex; flex-direction: column; gap: 6px; }
+    .pipe-hhi-bar-row { display: flex; align-items: center; gap: var(--space-sm); }
+    .pipe-hhi-bar-label { font-size: 0.7rem; color: var(--text-muted); min-width: 140px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .pipe-hhi-bar-track { flex: 1; height: 8px; background: var(--bg-elevated); border-radius: 4px; overflow: hidden; }
+    .pipe-hhi-bar-fill { height: 100%; background: var(--accent); border-radius: 4px; transform: scaleX(0); transform-origin: left; transition: transform 800ms cubic-bezier(0.25,1,0.5,1); }
+    .pipe-hhi-bar-val { font-family: var(--font-mono); font-size: 0.7rem; color: var(--accent); min-width: 42px; }
+
+    .pipe-ratio-compare { display: flex; align-items: center; justify-content: space-around; padding: var(--space-md) 0; }
+    .pipe-city { text-align: center; }
+    .pipe-city-val { font-family: var(--font-display); font-size: 1.75rem; font-weight: 700; line-height: 1; }
+    .pipe-city--madrid .pipe-city-val { color: var(--madrid); }
+    .pipe-city--barcelona .pipe-city-val { color: var(--barcelona); }
+    .pipe-city-name { font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-muted); margin-top: 4px; }
+    .pipe-ratio-badge {
+      font-family: var(--font-display); font-size: 2rem; font-weight: 900;
+      color: var(--accent); background: rgba(245,158,11,0.1); padding: 4px 16px;
+      border-radius: var(--radius-md); border: 1px solid var(--accent-dim);
+    }
+
+    .pipe-code {
+      display: flex; align-items: center; gap: var(--space-md);
+      background: var(--bg-elevated); border: 1px solid var(--border);
+      border-radius: var(--radius-md); padding: var(--space-md) var(--space-lg);
+      margin-top: var(--space-2xl); font-family: var(--font-mono); font-size: 0.875rem;
+    }
+    .pipe-code-label { color: var(--text-muted); font-size: 0.75rem; white-space: nowrap; }
+    .pipe-code code { color: var(--accent); }
+
+    /* ── Explainer boxes ────────────────────── */
+    .explainer-box {
+      background: var(--bg-elevated); border: 1px solid var(--border);
+      border-left: 4px solid var(--barcelona);
+      border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+      padding: var(--space-xl); margin-bottom: var(--space-2xl);
+    }
+    .explainer-title {
+      font-family: var(--font-mono); font-size: 0.7rem; text-transform: uppercase;
+      letter-spacing: 0.1em; color: var(--barcelona); margin-bottom: var(--space-md);
+    }
+    .explainer-box p { color: var(--text-secondary); font-size: 0.9375rem; margin-bottom: var(--space-sm); }
+    .explainer-box p:last-child { margin-bottom: 0; }
+    .explainer-box strong { color: var(--text-primary); }
+    .explainer-formula {
+      display: inline-block; font-family: var(--font-mono); font-size: 0.9375rem;
+      color: var(--barcelona); background: var(--bg-base);
+      padding: 2px 10px; border-radius: var(--radius-sm); margin: 2px 0;
+    }
+
+    /* ── Value block ─────────────────────────── */
+    .value-block-title {
+      font-family: var(--font-display); font-size: 1.125rem; font-weight: 700;
+      color: var(--text-primary); margin: var(--space-3xl) 0 var(--space-md);
+    }
+    .value-block {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-lg); margin-top: var(--space-md);
+    }
+    @media (max-width: 768px) { .value-block { grid-template-columns: 1fr; } }
+    .value-item {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius-md); padding: var(--space-lg);
+    }
+    .value-item-role {
+      font-family: var(--font-mono); font-size: 0.7rem; text-transform: uppercase;
+      letter-spacing: 0.1em; color: var(--accent); margin-bottom: var(--space-sm);
+    }
+    .value-item p { font-size: 0.875rem; color: var(--text-secondary); line-height: 1.55; }
+
+    /* ── Discussion ─────────────────────────── */
+    .cause-list { padding-left: var(--space-lg); color: var(--text-secondary); }
+    .cause-list li { margin-bottom: var(--space-sm); }
+    .cause-list strong { color: var(--text-primary); }
+    .not-list { display: flex; flex-direction: column; gap: var(--space-sm); }
+    .not-item { background: var(--bg-card); border: 1px solid var(--border); padding: var(--space-md) var(--space-lg); border-radius: var(--radius-md); color: var(--text-secondary); font-size: 0.9375rem; }
+    .not-item strong { color: var(--text-primary); }
+    .not-x { color: var(--alert); margin-right: var(--space-sm); font-weight: 700; }
+    .limits-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+    .limits-table th { text-align: left; padding: var(--space-sm) var(--space-md); background: var(--bg-elevated); color: var(--text-muted); font-family: var(--font-mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; border-bottom: 1px solid var(--border); }
+    .limits-table td { padding: var(--space-sm) var(--space-md); color: var(--text-secondary); border-bottom: 1px solid var(--border); vertical-align: top; }
+    .limits-table tr:last-child td { border-bottom: none; }
+
+    /* ── Conclusions ────────────────────────── */
+    .conclusions-list { display: flex; flex-direction: column; gap: var(--space-xl); margin-bottom: var(--space-2xl); }
+    .conclusion { display: flex; gap: var(--space-xl); align-items: flex-start; }
+    .conclusion-n {
+      font-family: var(--font-display); font-size: 3.5rem; font-weight: 900;
+      color: var(--accent); opacity: 0.3; line-height: 1; min-width: 60px; flex-shrink: 0;
+    }
+    .conclusion h3 { font-family: var(--font-display); font-size: 1.25rem; color: var(--text-primary); margin-bottom: var(--space-sm); }
+    .conclusion p { color: var(--text-secondary); }
+    .cta-block { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-lg); margin-bottom: var(--space-xl); }
+    @media (max-width: 640px) { .cta-block { grid-template-columns: 1fr; } }
+    .cta-label { display: block; font-family: var(--font-mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: var(--space-sm); }
+    .code-block { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-md); padding: var(--space-md); font-family: var(--font-mono); font-size: 0.8125rem; color: var(--text-secondary); overflow-x: auto; }
+    .source-pill-list { display: flex; flex-direction: column; gap: var(--space-sm); }
+    .source-pill { display: block; padding: var(--space-sm) var(--space-md); border-radius: var(--radius-md); font-size: 0.8125rem; font-family: var(--font-mono); text-decoration: none; }
+    .source-pill:hover { text-decoration: underline; }
+    .source-pill--madrid { background: rgba(245,158,11,0.1); color: var(--accent); }
+    .source-pill--barcelona { background: rgba(79,134,198,0.1); color: var(--barcelona); }
+    .competition-note { font-size: 0.875rem; color: var(--text-muted); border-top: 1px solid var(--border); padding-top: var(--space-lg); }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+    /* ── B81: Responsive ────────────────────── */
+    @media (max-width: 768px) {
+      .section { padding: var(--space-3xl) var(--space-md); }
+      .hero-title { font-size: clamp(2rem, 8vw, 3rem); }
+      .conclusion { flex-direction: column; gap: var(--space-md); }
+      .caso-header { flex-direction: column; gap: var(--space-md); }
+      .caso-n { font-size: 2rem; }
+      .pipeline-layout { gap: var(--space-lg); }
+      .pipe-step-header { flex-direction: column; }
+      .chart-header { flex-direction: column; gap: var(--space-xs); }
+      .cta-block { grid-template-columns: 1fr; }
+      .hero-meta { flex-direction: column; gap: var(--space-xs); }
+    }
+    /* ── Chart min-heights ───────────────────── */
+    #chart-hhi-sector { min-height: 420px; }
+    #chart-hhi-organos { min-height: 300px; }
+    #chart-frac { min-height: 200px; }
+    #gartner-chart { min-height: 160px; }
+    #moype-chart { min-height: 160px; }
+    #serintcom-chart { min-height: 160px; }
+    /* ── B80: Stagger hero stats ─────────────── */
+    .hero-stats .stat-card:nth-child(1) { animation-delay: 0ms; }
+    .hero-stats .stat-card:nth-child(2) { animation-delay: 100ms; }
+    .hero-stats .stat-card:nth-child(3) { animation-delay: 200ms; }
+    /* ── Separator ───────────────────────────── */
+    .section + .section { border-top: 1px solid var(--border); }
+  </style>
+</head>
+<body>
+
+  <a href="#hero" class="skip-link">Saltar al contenido</a>
+  <div id="progress-bar" role="progressbar" aria-label="Progreso de lectura"></div>
+
+  <nav aria-label="Tabla de contenidos">
+    <ul id="toc">
+      <li><a href="#hero"         data-label="Portada"       aria-label="§1 Portada"></a></li>
+      <li><a href="#intro"        data-label="Introducción"  aria-label="§2 Introducción"></a></li>
+      <li><a href="#datos"        data-label="Datos"         aria-label="§3 Datos"></a></li>
+      <li><a href="#metodologia"  data-label="Metodología"   aria-label="§4 Metodología"></a></li>
+      <li><a href="#resultados"   data-label="Resultados"    aria-label="§5 Resultados"></a></li>
+      <li><a href="#casos"        data-label="Casos"         aria-label="§6 Casos"></a></li>
+      <li><a href="#discusion"    data-label="Discusión"     aria-label="§7 Discusión"></a></li>
+      <li><a href="#conclusiones" data-label="Conclusiones"  aria-label="§8 Conclusiones"></a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <section id="hero" class="section" aria-labelledby="h-hero">
+      <div class="section__inner">
+        <div class="hero-eyebrow reveal">Concurso Datos Abiertos Madrid 2026</div>
+        <h1 id="h-hero" class="hero-title reveal">Vigilante de<br>Contratación Menor</h1>
+        <p class="hero-tagline reveal">Madrid vs. Barcelona · 2023–2025</p>
+
+        <div class="hero-stats reveal" aria-label="Estadísticas principales">
+          <div class="stat-card">
+            <div class="stat-number" id="cnt-contratos" data-target="15778">0</div>
+            <div class="stat-label">contratos analizados<br><span class="stat-sub">Madrid 2023–2025</span></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" id="cnt-importe" data-target="109">0</div>
+            <div class="stat-label">millones de euros<br><span class="stat-sub">sin concurso público</span></div>
+          </div>
+          <div class="stat-card stat-card--ratio">
+            <div class="stat-number" id="cnt-ratio">0x</div>
+            <div class="stat-label">más concentrado<br><span class="stat-sub">Madrid vs Barcelona (HHI)</span></div>
+          </div>
+        </div>
+
+        <p class="hero-abstract reveal">
+          Los contratos menores son adjudicaciones directas por debajo de €15.000 en servicios
+          y €40.000 en obras. Constituyen el segmento menos visible de la contratación pública española:
+          no requieren publicidad ni concurrencia competitiva. Este estudio analiza
+          <strong>15.778 contratos de Madrid</strong> y 62.473 de Barcelona aplicando el índice
+          Herfindahl-Hirschman (HHI) como indicador de concentración de proveedor y la heurística del
+          artículo 99.2 LCSP para detectar posibles fraccionamientos.
+          Madrid presenta una mediana HHI 3,6 veces superior a Barcelona.
+          Se identifican <strong>866 alertas de fraccionamiento</strong> y cuatro casos de estudio
+          con patrón documentado. El código y los datos de origen están disponibles en repositorio público.
+        </p>
+
+        <div class="hero-meta reveal">
+          <span>Datos: <a href="https://datos.madrid.es/dataset/300253-0-contratos-actividad-menores" target="_blank" rel="noopener">datos.madrid.es</a> · <a href="https://opendata-ajuntament.barcelona.cat/data/es/dataset/perfil-contractant" target="_blank" rel="noopener">opendata.bcn.cat</a></span>
+          <span>Actualizado: <time datetime="2026-04-28">28 abril 2026</time></span>
+        </div>
+
+        <div class="hero-scroll-hint reveal" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 4v12M4 10l6 6 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Continúa leyendo
+        </div>
+      </div>
+    </section>
+
+    <section id="intro" class="section section--prose" aria-labelledby="h-intro">
+      <div class="section__inner">
+        <div class="section-label reveal">§2 — Introducción</div>
+        <h2 id="h-intro" class="section-title reveal">El punto ciego de la contratación pública</h2>
+
+        <div class="prose reveal">
+          <p>En España, los <strong>contratos menores</strong> mueven cifras importantes con muy poca fricción procedimental. Son adjudicaciones directas por debajo de los umbrales que fija la <strong>Ley de Contratos del Sector Público</strong> (LCSP): <mark class="highlight">€15.000 para servicios y suministros</mark>, <mark class="highlight">€40.000 para obras</mark> (sin IVA). Agilizan compras de pequeño importe sin la carga de una licitación completa, y la propia ley reconoce su utilidad. En Madrid suponen <strong>€109,9M en 2023–2025</strong> —entre el 3 % y el 4 % del presupuesto municipal ejecutado anual—, una proporción razonable y comparable a la de otras grandes administraciones. La pregunta interesante, por tanto, no es cuánto se gasta por esta vía sino <em>cómo se distribuye ese gasto</em>: si se concentra en pocos proveedores, si determinados órganos contratantes se apoyan sistemáticamente en los mismos NIFs, y si esa distribución mejora o empeora año a año. Este trabajo es posible precisamente porque Madrid publica sus contratos menores como datos abiertos reutilizables —la transparencia es la condición de partida del análisis.</p>
+
+          <p>La fragilidad del régimen está reconocida en la propia LCSP, cuyo artículo 99.2 lo blinda: <em>«no podrá fraccionarse un contrato con la finalidad de disminuir la cuantía del mismo y eludir así los requisitos de publicidad o los relativos al procedimiento de adjudicación que correspondan.»</em> El supuesto típico es nítido: un servicio de €28.000 que debería licitarse puede aparecer como dos contratos de €13.900 al mismo NIF en el mismo mes —cada uno individualmente legal, el patrón conjunto activa el supuesto. El obstáculo no es jurídico sino operativo: detectarlo exige cruzar todos los contratos de cada proveedor en ventanas temporales cortas, una operación que ningún portal de datos abiertos español ofrece de forma automatizada hoy. De ahí la oportunidad de este trabajo: convertir los datos publicados en una capa analítica reutilizable que cualquier administración pueda incorporar a su práctica de control.</p>
+
+          <h3>Cómo se mide: comparativa Madrid–Barcelona, HHI y CPV</h3>
+          <p>Para distinguir riesgo real de variabilidad estructural del mercado, el análisis compara Madrid con Barcelona —las dos administraciones municipales más grandes de España, similares en escala pero con culturas de contratación diferenciadas. Si un sector aparece muy concentrado en Madrid pero no en Barcelona, la causa más probable no es la estructura del mercado, común a ambas ciudades, sino la institución compradora. La comparativa funciona como <strong>experimento natural</strong> y resulta útil precisamente porque señala dónde conviene reforzar la concurrencia, centralizar compras o revisar el diseño de los procesos.</p>
+          <p>La concentración se cuantifica con el <strong>índice HHI</strong> (Herfindahl-Hirschman): suma de los cuadrados de las cuotas de cada proveedor, donde 0 representa competencia perfecta y 1 monopolio. La Comisión Europea y el Departamento de Justicia de EE. UU. consideran «altamente concentrado» cualquier mercado con <strong>HHI superior a 0,25</strong>. La clasificación sectorial utiliza los códigos <strong>CPV</strong> (Common Procurement Vocabulary), el vocabulario estándar europeo para describir el objeto de un contrato. Barcelona los publica de forma nativa; Madrid aún no los incluye en sus contratos menores, así que se infieren mediante un diccionario de 52 reglas regex aplicado al texto libre del objeto. Adoptar el CPV nativo también en contratos menores sería el paso natural para cerrar la asimetría de transparencia entre ambas administraciones y facilitar comparativas homologadas a escala europea.</p>
+        </div>
+
+        <h3 class="value-block-title reveal">Una herramienta al servicio del bien común</h3>
+        <div class="value-block reveal" aria-label="Beneficios para el bien común">
+          <div class="value-item">
+            <div class="value-item-role">Administraciones públicas</div>
+            <p>Autodiagnóstico institucional reproducible: identificar dónde un acuerdo marco reduciría
+            la fragmentación, qué sectores se beneficiarían de licitaciones centralizadas y qué órganos
+            requieren refuerzo preventivo. La metodología es extensible a cualquier ayuntamiento o
+            entidad que publique contratos menores como datos abiertos.</p>
+          </div>
+          <div class="value-item">
+            <div class="value-item-role">Control interno y transparencia</div>
+            <p>Intervención General, OCEX, OCEM y oficinas de transparencia disponen de un marco
+            metodológico verificable (HHI + LCSP Art. 99.2) sobre el que priorizar auditorías y
+            construir sistemas de alerta temprana basados en evidencia cuantitativa, no en señales
+            aisladas o filtraciones.</p>
+          </div>
+          <div class="value-item">
+            <div class="value-item-role">Ciudadanía e investigación cívica</div>
+            <p>Comprender en segundos cómo se distribuye una parte sustancial del gasto público,
+            sin software propietario ni conocimiento técnico previo. Periodistas, asociaciones
+            vecinales y observatorios cívicos construyen sobre esta base común para reforzar la
+            confianza en lo público.</p>
+          </div>
+        </div>
+
+        <div class="lcsp-box reveal" role="note" aria-label="Nota legal LCSP">
+          <span class="lcsp-tag">Base legal</span>
+          <p>Los términos <strong>«Indicador de Riesgo»</strong> y <strong>«alerta»</strong> empleados en
+          este estudio no implican irregularidad confirmada. Los patrones detectados requieren contraste con
+          la documentación del expediente administrativo correspondiente (LCSP Art. 99.2).</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="datos" class="section section--prose" aria-labelledby="h-datos">
+      <div class="section__inner">
+        <div class="section-label reveal">§3 — Datos &amp; Fuentes</div>
+        <h2 id="h-datos" class="section-title reveal">Dos ciudades, dos portales</h2>
+
+        <div class="source-cards reveal">
+          <div class="source-card source-card--madrid">
+            <div class="source-city">Madrid</div>
+            <div class="source-name">Portal CKAN — Contratos Menores</div>
+            <div class="source-stats">
+              <span><strong>15.778</strong> contratos</span>
+              <span><strong>€109,9M</strong> (2023–2025) · ~€36,6M/año</span>
+            </div>
+            <div class="source-detail">Formato: XLSX mensual · Sin CPV nativo (inferido por diccionario)</div>
+            <div class="source-caveat">Fecha = inscripción, no adjudicación</div>
+          </div>
+          <div class="source-card source-card--barcelona">
+            <div class="source-city">Barcelona</div>
+            <div class="source-name">Perfil del Contractant — PSCP</div>
+            <div class="source-stats">
+              <span><strong>62.473</strong> contratos</span>
+              <span><strong>€201,6M</strong> (2023–2025) · ~€67,2M/año</span>
+            </div>
+            <div class="source-detail">Formato: API SQL datastore · CPV nativo disponible</div>
+            <div class="source-caveat" title="Incluye fundaciones, empresas y organismos autónomos municipales. Madrid no publica contratos menores de sus entidades análogas (EMT, Canal, Matadero), lo que subestima su volumen real.">Incluye todo el Grupo Municipal ⓘ</div>
+          </div>
+        </div>
+
+        <div class="prose reveal">
+          <h3>¿Por qué Barcelona tiene 4× más contratos?</h3>
+          <p>Barcelona incluye entidades del Grupo Municipal (fundaciones, empresas públicas) con sus propias
+          carteras de contratación. Esta diferencia de ámbito explica el mayor volumen. Por eso
+          <strong>todas las comparativas usan métricas relativas</strong> (HHI, % del presupuesto), nunca
+          volúmenes absolutos.</p>
+        </div>
+
+        <div class="timeline reveal" aria-label="Cobertura temporal">
+          <div class="timeline-title">Cobertura por año</div>
+          <div class="timeline-row">
+            <span class="timeline-year">2023</span>
+            <div class="timeline-bar-wrap">
+              <div class="timeline-bar timeline-bar--mad" style="width:37%" title="Madrid 5.719">
+                <span>Madrid 5.719</span></div>
+              <div class="timeline-bar timeline-bar--bcn" style="width:100%" title="Barcelona 20.000+">
+                <span>Barcelona 20.000+</span></div>
+            </div>
+          </div>
+          <div class="timeline-row">
+            <span class="timeline-year">2024</span>
+            <div class="timeline-bar-wrap">
+              <div class="timeline-bar timeline-bar--mad" style="width:35%" title="Madrid 5.535">
+                <span>Madrid 5.535</span></div>
+              <div class="timeline-bar timeline-bar--bcn" style="width:100%">
+                <span>Barcelona 21.000+</span></div>
+            </div>
+          </div>
+          <div class="timeline-row">
+            <span class="timeline-year">2025</span>
+            <div class="timeline-bar-wrap">
+              <div class="timeline-bar timeline-bar--mad" style="width:29%" title="Madrid 4.524 (parcial)">
+                <span>Madrid 4.524*</span></div>
+              <div class="timeline-bar timeline-bar--bcn" style="width:100%">
+                <span>Barcelona 21.000+</span></div>
+            </div>
+          </div>
+          <p class="timeline-note">* Madrid 2025 parcial hasta corte de análisis (abril 2026)</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="metodologia" class="section" aria-labelledby="h-metodologia">
+      <div class="section__inner">
+        <div class="section-label reveal">§4 — Metodología</div>
+        <h2 id="h-metodologia" class="section-title reveal">Pipeline reproducible</h2>
+        <p class="pipe-subtitle reveal">5 pasos automatizados. Un comando. Datos frescos cada ejecución.</p>
+
+        <div class="pipeline-layout">
+          <!-- SVG diagram -->
+          <div class="pipeline-diagram" aria-hidden="true">
+            <svg id="pipe-svg" viewBox="0 0 160 520" xmlns="http://www.w3.org/2000/svg">
+              <!-- connector paths -->
+              <path id="pipe-line-01" d="M80 80 L80 140" stroke="#2a2a3a" stroke-width="2" fill="none" stroke-dasharray="60" stroke-dashoffset="60"/>
+              <path id="pipe-line-12" d="M80 180 L80 240" stroke="#2a2a3a" stroke-width="2" fill="none" stroke-dasharray="60" stroke-dashoffset="60"/>
+              <path id="pipe-line-23" d="M80 280 L80 340" stroke="#2a2a3a" stroke-width="2" fill="none" stroke-dasharray="60" stroke-dashoffset="60"/>
+              <path id="pipe-line-34" d="M80 380 L80 440" stroke="#2a2a3a" stroke-width="2" fill="none" stroke-dasharray="60" stroke-dashoffset="60"/>
+              <!-- nodes -->
+              <g class="pipe-node" data-step="0" id="pn-0">
+                <circle cx="80" cy="50" r="36" fill="#1a1a24" stroke="#2a2a3a" stroke-width="2"/>
+                <text x="80" y="44" text-anchor="middle" fill="#55556a" font-size="10" font-family="Fira Code">PASO 1</text>
+                <text x="80" y="58" text-anchor="middle" fill="#9090a8" font-size="9" font-family="Fira Code">CARGA</text>
+              </g>
+              <g class="pipe-node" data-step="1" id="pn-1">
+                <circle cx="80" cy="160" r="36" fill="#1a1a24" stroke="#2a2a3a" stroke-width="2"/>
+                <text x="80" y="154" text-anchor="middle" fill="#55556a" font-size="10" font-family="Fira Code">PASO 2</text>
+                <text x="80" y="168" text-anchor="middle" fill="#9090a8" font-size="9" font-family="Fira Code">CPV</text>
+              </g>
+              <g class="pipe-node" data-step="2" id="pn-2">
+                <circle cx="80" cy="270" r="36" fill="#1a1a24" stroke="#2a2a3a" stroke-width="2"/>
+                <text x="80" y="264" text-anchor="middle" fill="#55556a" font-size="10" font-family="Fira Code">PASO 3</text>
+                <text x="80" y="278" text-anchor="middle" fill="#9090a8" font-size="9" font-family="Fira Code">HHI</text>
+              </g>
+              <g class="pipe-node" data-step="3" id="pn-3">
+                <circle cx="80" cy="380" r="36" fill="#1a1a24" stroke="#2a2a3a" stroke-width="2"/>
+                <text x="80" y="374" text-anchor="middle" fill="#55556a" font-size="10" font-family="Fira Code">PASO 4</text>
+                <text x="80" y="388" text-anchor="middle" fill="#9090a8" font-size="9" font-family="Fira Code">LCSP</text>
+              </g>
+              <g class="pipe-node" data-step="4" id="pn-4">
+                <circle cx="80" cy="490" r="36" fill="#1a1a24" stroke="#2a2a3a" stroke-width="2"/>
+                <text x="80" y="484" text-anchor="middle" fill="#55556a" font-size="10" font-family="Fira Code">PASO 5</text>
+                <text x="80" y="498" text-anchor="middle" fill="#9090a8" font-size="9" font-family="Fira Code">RATIO</text>
+              </g>
+            </svg>
+          </div>
+
+          <!-- Step detail panel -->
+          <div class="pipeline-steps">
+            <div class="pipe-step active" id="ps-0" data-step="0">
+              <div class="pipe-step-header">
+                <span class="pipe-step-n">01</span>
+                <div>
+                  <div class="pipe-step-fn">cargar_madrid()</div>
+                  <div class="pipe-step-title">Adquisición y normalización</div>
+                </div>
+              </div>
+              <div class="pipe-step-stat">15.778 contratos · 3 ficheros XLSX anuales</div>
+              <div class="pipe-step-detail">
+                <div class="pipe-mini-card">
+                  <div class="pipe-mini-label">Ejemplo — contrato real</div>
+                  <div class="pipe-row"><span class="pipe-k">Objeto</span><span class="pipe-v">SUSCRIPCIÓN A LA BASE DE DATOS GARTNER</span></div>
+                  <div class="pipe-row"><span class="pipe-k">Órgano</span><span class="pipe-v">COORDINADORA GENERAL DE LA ALCALDÍA</span></div>
+                  <div class="pipe-row"><span class="pipe-k">Importe</span><span class="pipe-v accent">€127.655</span></div>
+                  <div class="pipe-row"><span class="pipe-k">Fecha</span><span class="pipe-v">2023-03-22</span></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="pipe-step" id="ps-1" data-step="1">
+              <div class="pipe-step-header">
+                <span class="pipe-step-n">02</span>
+                <div>
+                  <div class="pipe-step-fn">clasificar_cpv()</div>
+                  <div class="pipe-step-title">Clasificación sectorial</div>
+                </div>
+              </div>
+              <div class="pipe-step-stat">52 reglas regex → CPV L1 · cobertura 52%</div>
+              <div class="pipe-step-detail">
+                <div class="pipe-mini-card">
+                  <div class="pipe-mini-label">Contexto</div>
+                  <p style="font-size:0.8125rem;color:var(--text-secondary);margin-bottom:var(--space-sm);">Los códigos CPV (<em>Common Procurement Vocabulary</em>) son el vocabulario estándar europeo para clasificar qué tipo de bien o servicio se contrata en cada expediente. Barcelona los publica de forma nativa; Madrid no incluye CPV en sus contratos menores.</p>
+                </div>
+                <div class="pipe-mini-card" style="margin-top:var(--space-sm)">
+                  <div class="pipe-mini-label">Ejemplo — inferencia CPV desde texto libre</div>
+                  <div class="pipe-typewriter-wrap">
+                    <div class="pipe-row"><span class="pipe-k">Texto Madrid</span><span class="pipe-v" id="tw-in">SERVICIO DE LIMPIEZA DE EDIFICIOS</span></div>
+                    <div class="pipe-arrow">↓ regex match (regla 52 del diccionario)</div>
+                    <div class="pipe-row"><span class="pipe-k">CPV inferido</span><span class="pipe-v accent">90910000 — Servicios de limpieza</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="pipe-step" id="ps-2" data-step="2">
+              <div class="pipe-step-header">
+                <span class="pipe-step-n">03</span>
+                <div>
+                  <div class="pipe-step-fn">calcular_hhi()</div>
+                  <div class="pipe-step-title">Índice Herfindahl-Hirschman</div>
+                </div>
+              </div>
+              <div class="pipe-step-stat">HHI = Σ(cuota_i²) · 120 órganos Madrid · 42 Barcelona</div>
+              <div class="pipe-step-detail">
+                <div class="pipe-mini-card">
+                  <div class="pipe-mini-label">Top 3 órganos Madrid (HHI más alto)</div>
+                  <div class="pipe-hhi-bars" id="pipe-hhi-chart" role="img" aria-label="Top 3 órganos HHI Madrid"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="pipe-step" id="ps-3" data-step="3">
+              <div class="pipe-step-header">
+                <span class="pipe-step-n">04</span>
+                <div>
+                  <div class="pipe-step-fn">detectar_fraccionamiento()</div>
+                  <div class="pipe-step-title">Escáner LCSP Art. 99.2</div>
+                </div>
+              </div>
+              <div class="pipe-step-stat">866 alertas · 279 NIFs · ventana 30 días</div>
+              <div class="pipe-step-detail">
+                <div class="pipe-mini-card pipe-mini-card--alert">
+                  <div class="pipe-mini-label">Alerta mayor — IMPLASER 99 SL</div>
+                  <div class="pipe-row"><span class="pipe-k">Tipo</span><span class="pipe-v">Obras</span></div>
+                  <div class="pipe-row"><span class="pipe-k">Contratos</span><span class="pipe-v">5 en 30 días</span></div>
+                  <div class="pipe-row"><span class="pipe-k">Suma sin IVA</span><span class="pipe-v">€145.940</span></div>
+                  <div class="pipe-row"><span class="pipe-k">Umbral LCSP</span><span class="pipe-v">€40.000</span></div>
+                  <div class="pipe-row"><span class="pipe-k">Exceso</span><span class="pipe-v alert">+€105.940</span></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="pipe-step" id="ps-4" data-step="4">
+              <div class="pipe-step-header">
+                <span class="pipe-step-n">05</span>
+                <div>
+                  <div class="pipe-step-fn">comparativa_bcn()</div>
+                  <div class="pipe-step-title">Ratio Madrid vs Barcelona</div>
+                </div>
+              </div>
+              <div class="pipe-step-stat">Mediana HHI Madrid 3,6× superior a Barcelona</div>
+              <div class="pipe-step-detail">
+                <div class="pipe-mini-card">
+                  <div class="pipe-mini-label">Mediana HHI por órgano</div>
+                  <div class="pipe-ratio-compare">
+                    <div class="pipe-city pipe-city--madrid">
+                      <div class="pipe-city-val">0,044</div>
+                      <div class="pipe-city-name">Madrid</div>
+                    </div>
+                    <div class="pipe-ratio-badge">3,6×</div>
+                    <div class="pipe-city pipe-city--barcelona">
+                      <div class="pipe-city-val">0,012</div>
+                      <div class="pipe-city-name">Barcelona</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pipe-code reveal">
+          <span class="pipe-code-label">Código disponible en repositorio público · ETL reproducible</span>
+          <code>git clone https://github.com/GonxoMR/vigilante &amp;&amp; python analysis/pipeline.py</code>
+        </div>
+      </div>
+    </section>
+
+    <section id="resultados" class="section" aria-labelledby="h-resultados">
+      <div class="section__inner">
+        <div class="section-label reveal">§5 — Resultados</div>
+        <h2 id="h-resultados" class="section-title reveal">Madrid 3,6× más concentrado</h2>
+
+        <!-- B60: HHI sector chart -->
+        <div class="chart-block reveal">
+          <div class="chart-header">
+            <h3 class="chart-title">HHI por sector — Madrid vs Barcelona</h3>
+            <div class="chart-legend">
+              <span class="legend-dot legend-dot--madrid"></span>Madrid
+              <span class="legend-dot legend-dot--barcelona"></span>Barcelona
+            </div>
+          </div>
+          <p class="chart-desc">Índice Herfindahl-Hirschman por división CPV. Ordenado por ratio Madrid/Barcelona (mayor anomalía primero). Top 5 con ratio destacado.</p>
+          <div id="chart-hhi-sector" role="img" aria-label="Gráfico HHI por sector CPV, comparativa Madrid vs Barcelona"></div>
+        </div>
+
+        <!-- B62: HHI órganos distribution -->
+        <div class="chart-block reveal">
+          <div class="chart-header">
+            <h3 class="chart-title">Distribución HHI — Top 20 órganos Madrid</h3>
+          </div>
+          <p class="chart-desc">Cola derecha: 3 órganos superan umbral HHI >0,25 (altamente concentrado). En Barcelona ninguno lo supera.</p>
+          <div id="chart-hhi-organos" role="img" aria-label="Distribución HHI top 20 órganos Madrid"></div>
+        </div>
+
+        <!-- B61: Fraccionamiento scatter -->
+        <div class="chart-block reveal">
+          <div class="chart-header">
+            <h3 class="chart-title">Alertas de fraccionamiento LCSP — Top 30</h3>
+            <div class="chart-legend">
+              <span class="legend-dot legend-dot--obras"></span>Obras
+              <span class="legend-dot legend-dot--servicios"></span>Servicios/Suministros
+            </div>
+          </div>
+          <p class="chart-desc">866 alertas totales. Cada punto es una ventana de 30 días donde un proveedor supera el umbral legal (obras: €40.000, servicios/suministros: €15.000 sin IVA). El eje Y muestra cuánto excede la suma acumulada al umbral aplicable.</p>
+          <div id="chart-frac" role="img" aria-label="Scatter plot alertas de fraccionamiento LCSP Art 99.2"></div>
+        </div>
+
+      </div>
+    </section>
+
+    <section id="casos" class="section" aria-labelledby="h-casos">
+      <div class="section__inner">
+        <div class="section-label reveal">§6 — Casos de Estudio</div>
+        <h2 id="h-casos" class="section-title reveal">Cuatro patrones, datos reales</h2>
+        <p class="chart-desc reveal">Los cuatro casos proceden directamente del análisis cuantitativo y son verificables contra los datos originales del portal municipal. Su presencia aquí no constituye afirmación de irregularidad; indica que el patrón cumple los criterios heurísticos que justificarían revisión por parte de los órganos de control competentes (art. 99.2 LCSP).</p>
+
+        <!-- B70: Gartner -->
+        <div class="caso-block reveal">
+          <div class="caso-header">
+            <span class="caso-n">01</span>
+            <div>
+              <div class="caso-eyebrow">Hallazgo 1 · Servicios TI (CPV 72000000)</div>
+              <h3 class="caso-title">Gartner España: +76% sin licitación</h3>
+              <p class="caso-desc">Suscripción a bases de datos estratégicas renovada como contrato menor sucesivo. €527.651 en 4 contratos (2023–2025). La naturaleza continua del servicio sugiere que debería articularse como contrato plurianual con concurso.</p>
+            </div>
+          </div>
+          <div class="caso-viz">
+            <div class="gartner-bars" id="gartner-chart" role="img" aria-label="Evolución importe Gartner 2023-2025"></div>
+          </div>
+          <div class="caso-badges">
+            <span class="badge badge-risk">Sin licitación</span>
+            <span class="badge badge-info">NIF: B84184217</span>
+            <span class="badge badge-neutral">LCSP Art. 99.2</span>
+          </div>
+          <div class="caso-context">
+            <span class="caso-context-label">Por qué importa</span>
+            Gartner es proveedor único en su nicho (research analítico TI). El crecimiento del +76% interanual en un servicio de naturaleza continuada, articulado como contratos menores sucesivos en lugar de un acuerdo marco plurianual, eleva el HHI del CPV 72000000 (servicios TI) hasta <strong>0,103</strong> en Madrid frente a <strong>0,003</strong> en Barcelona (ratio 32×). El art. 29.4 LCSP exige licitación cuando el gasto recurrente supera los umbrales acumulados; la fragmentación temporal del gasto convierte un contrato plurianual en cuatro contratos menores anuales individualmente legales.
+          </div>
+        </div>
+
+        <!-- B71: MOYPE -->
+        <div class="caso-block reveal">
+          <div class="caso-header">
+            <span class="caso-n">02</span>
+            <div>
+              <div class="caso-eyebrow">Hallazgo 2 · Material deportivo (CPV 37000000)</div>
+              <h3 class="caso-title">MOYPE SPORT: un proveedor, 23 distritos</h3>
+              <p class="caso-desc">€711.115 en 91 contratos (2023–2025). Cada distrito adjudica de forma independiente, pero el proveedor es siempre el mismo. A escala municipal el gasto justificaría un acuerdo marco con licitación abierta.</p>
+            </div>
+          </div>
+          <div class="caso-viz">
+            <div id="moype-chart" role="img" aria-label="MOYPE SPORT gasto por distrito Madrid"></div>
+          </div>
+          <div class="caso-badges">
+            <span class="badge badge-risk">Fragmentación orgánica</span>
+            <span class="badge badge-info">23 distritos · €711k</span>
+            <span class="badge badge-neutral">NIF: A78111549</span>
+          </div>
+          <div class="caso-context">
+            <span class="caso-context-label">Por qué importa</span>
+            La descentralización por distritos crea 23 puntos de compra independientes para un mismo bien (material deportivo). Distrito de Latina concentra €143k en 13 contratos; Moratalaz €92k en 8. Si Madrid centralizara estas compras municipales en un acuerdo marco, el volumen agregado (€711k en 3 años) excedería ampliamente el umbral LCSP de licitación abierta para suministros (~€140k anual). El patrón es legal en cada distrito tomado por separado, pero <strong>elude la concurrencia obligatoria a escala municipal</strong>.
+          </div>
+        </div>
+
+        <!-- B72: Serintcom -->
+        <div class="caso-block reveal">
+          <div class="caso-header">
+            <span class="caso-n">03</span>
+            <div>
+              <div class="caso-eyebrow">Hallazgo 3 · Madrid Salud (persona física)</div>
+              <h3 class="caso-title">SERINTCOM: 0 de 18 contratos supera el umbral</h3>
+              <p class="caso-desc">Persona física. €262.701 en 18 contratos (2023–2025). Importe máximo sin IVA: €14.990, nunca supera el umbral LCSP de €15.000 por €10. La probabilidad de que sea aleatorio es estadísticamente negligible.</p>
+            </div>
+          </div>
+          <div class="caso-viz">
+            <div id="serintcom-chart" role="img" aria-label="Timeline contratos SERINTCOM vs umbral LCSP €15.000"></div>
+          </div>
+          <div class="caso-badges">
+            <span class="badge badge-risk">Dimensionamiento deliberado</span>
+            <span class="badge badge-info">18 contratos · 0 > umbral</span>
+            <span class="badge badge-neutral">NIF: 05341273Y</span>
+          </div>
+          <div class="caso-context">
+            <span class="caso-context-label">Por qué importa</span>
+            La distribución de importes es estadísticamente inverosímil bajo independencia. Si los precios fueran negociaciones reales independientes, la probabilidad de que <strong>los 18 valores caigan dentro del intervalo €12.000–€15.000 (límite −20% al límite)</strong> es inferior al 0,001%. El patrón sugiere que la cifra final se ajusta deliberadamente para mantenerse bajo el umbral LCSP de €15.000, evitando el procedimiento de licitación restringida del art. 159 LCSP. Se trata del indicador más limpio del dataset: no requiere análisis sectorial ni comparativa entre ciudades.
+          </div>
+        </div>
+
+        <!-- B73: IMPLASER 99 -->
+        <div class="caso-block reveal">
+          <div class="caso-header">
+            <span class="caso-n">04</span>
+            <div>
+              <div class="caso-eyebrow">Hallazgo 4 · Obras · Distrito Moncloa-Aravaca</div>
+              <h3 class="caso-title">IMPLASER 99: 5 obras en un mismo día</h3>
+              <p class="caso-desc">€145.940 en 5 contratos de obras adjudicados el 19 de diciembre de 2023 al mismo proveedor y órgano. El umbral LCSP para obras es €40.000 sin IVA. Los cinco contratos individualmente no lo superan; acumulados cuadruplican el límite legal (3,65×). El patrón temporal —adjudicación simultánea en el último mes del ejercicio— refuerza la señal de alerta.</p>
+            </div>
+          </div>
+          <div class="caso-viz">
+            <div id="implaser-chart" role="img" aria-label="Timeline 5 contratos IMPLASER 99 vs umbral LCSP €40.000"></div>
+          </div>
+          <div class="caso-badges">
+            <span class="badge badge-risk">Fraccionamiento temporal</span>
+            <span class="badge badge-info">5 contratos · 1 día · €145.940</span>
+            <span class="badge badge-neutral">NIF: B50776947</span>
+          </div>
+          <div class="caso-context">
+            <span class="caso-context-label">Por qué importa</span>
+            Es el caso más nítido del dataset que cumple los criterios del art. 99.2 LCSP: <strong>mismo proveedor, mismo órgano contratante, mismo tipo de prestación (obras de accesibilidad), mismo día de adjudicación</strong>. El umbral de €40.000 para obras existe precisamente para forzar licitación cuando el gasto agregado supera ese nivel; cinco contratos de adecuación de centros municipales bajo un único proveedor en una sola fecha contradicen literalmente la finalidad del precepto. Adicionalmente, la adjudicación en diciembre coincide con el cierre presupuestario anual, patrón típico de ejecución acelerada de remanentes.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="discusion" class="section section--prose" aria-labelledby="h-discusion">
+      <div class="section__inner">
+        <div class="section-label reveal">§7 — Discusión</div>
+        <h2 id="h-discusion" class="section-title reveal">Implicaciones y limitaciones</h2>
+
+        <div class="prose">
+          <p class="reveal">Un HHI 3,6 veces superior en Madrid no equivale a una acusación de mala praxis.
+          La concentración puede tener causas estructurales, institucionales o metodológicas, y en la
+          práctica probablemente concurren varias:</p>
+
+          <ul class="cause-list reveal">
+            <li><strong>Estructura de mercado sectorial:</strong> algunos sectores tienen pocos proveedores cualificados. Esto explicaría convergencia entre ciudades, pero Madrid muestra ratios de 39×.</li>
+            <li><strong>Preferencia institucional:</strong> relaciones establecidas con proveedores habituales, facilitadas por la ausencia de concurrencia obligatoria.</li>
+            <li><strong>Fragmentación geográfica:</strong> cada distrito actúa como comprador independiente (caso MOYPE), multiplicando contratos menores en lugar de centralizar licitaciones.</li>
+            <li><strong>Diferencia de ámbito:</strong> Barcelona incluye entidades del Grupo Municipal con mayor diversidad de proveedores, comprimiendo artificialmente el HHI barcelonés.</li>
+          </ul>
+
+          <h3 class="reveal">Qué NO significa un HHI alto</h3>
+          <div class="reveal">
+            <div class="not-list">
+              <div class="not-item"><span class="not-x">✕</span> <strong>No es prueba de irregularidad.</strong> HHI alto puede ser estructural o estratégico.</div>
+              <div class="not-item"><span class="not-x">✕</span> <strong>No es fraude.</strong> El término correcto es <em>Indicador de Riesgo</em> (LCSP Art. 99.2).</div>
+              <div class="not-item"><span class="not-x">✕</span> <strong>No es comparable en volumen absoluto.</strong> Barcelona tiene 4× más contratos.</div>
+            </div>
+          </div>
+
+          <h3 class="reveal">Recomendación: Madrid debería adoptar CPV</h3>
+          <p class="reveal">La principal barrera metodológica de este análisis es la ausencia de códigos CPV en los contratos menores de Madrid. Barcelona los publica de forma nativa, lo que permite comparativas sectoriales directas. Recomendamos que Madrid implemente el uso obligatorio de CPV en sus contratos menores, en línea con la práctica del resto de grandes administraciones europeas. Esta medida mejoraría la transparencia comparativa, facilitaría el control del fraccionamiento por sector y permitiría auditorías cruzadas con datos del PLCSP.</p>
+
+          <h3 class="reveal">Limitaciones metodológicas</h3>
+          <div class="reveal">
+            <table class="limits-table" aria-label="Limitaciones metodológicas">
+              <thead><tr><th>Limitación</th><th>Impacto</th></tr></thead>
+              <tbody>
+                <tr><td>CPV Madrid inferido, 48% sin clasificar</td><td>Sesgo en análisis sectorial</td></tr>
+                <tr><td>Fecha Madrid = inscripción, no adjudicación</td><td>Distorsión en ventanas de fraccionamiento</td></tr>
+                <tr><td>IVA diferenciado: 10% obras, 21% servicios/suministros</td><td>Corrección aplicada en pipeline v2</td></tr>
+                <tr><td>Barcelona incluye todo el Grupo Municipal</td><td>HHI BCN naturalmente más bajo</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="conclusiones" class="section section--prose" aria-labelledby="h-conclusiones">
+      <div class="section__inner">
+        <div class="section-label reveal">§8 — Conclusiones</div>
+        <h2 id="h-conclusiones" class="section-title reveal">Cuatro hallazgos, un repositorio</h2>
+
+        <div class="conclusions-list">
+          <div class="conclusion reveal">
+            <span class="conclusion-n">01</span>
+            <div>
+              <h3>Concentración sistémicamente superior en Madrid</h3>
+              <p>Mediana HHI 0,044 vs 0,012 Barcelona (3,6×). En sectores TI o señalización vial los ratios
+              alcanzan 31–40×. El patrón persiste en 2023, 2024 y 2025.</p>
+            </div>
+          </div>
+          <div class="conclusion reveal">
+            <span class="conclusion-n">02</span>
+            <div>
+              <h3>El fraccionamiento es detectable, frecuente y subestimado</h3>
+              <p>866 ventanas de 30 días muestran un mismo proveedor superando los umbrales LCSP. El caso más
+              llamativo (IMPLASER 99 SL) acumula €145.940 en obras en 30 días cuando el umbral legal es €40.000.</p>
+            </div>
+          </div>
+          <div class="conclusion reveal">
+            <span class="conclusion-n">03</span>
+            <div>
+              <h3>La transparencia requiere herramientas, no solo datos</h3>
+              <p>Los datos de contratación menor son públicos. El problema es la fricción analítica.
+              Antes de este trabajo, identificar un patrón como el de Serintcom requería descargar y
+              cruzar manualmente tres ficheros XLSX de dos portales con esquemas distintos. El análisis
+              automático no elimina la necesidad de revisión experta, pero reduce el coste de la
+              primera detección de forma sustancial.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="cta-block reveal">
+          <div class="cta-repro">
+            <span class="cta-label">Reproducibilidad</span>
+            <pre class="code-block"><code>git clone https://github.com/GonxoMR/vigilante
+cd vigilante
+pip install -r requirements.txt
+python analysis/pipeline.py</code></pre>
+          </div>
+
+          <div class="cta-sources">
+            <span class="cta-label">Datos abiertos utilizados</span>
+            <div class="source-pill-list">
+              <a href="https://datos.madrid.es/dataset/300253-0-contratos-actividad-menores" target="_blank" rel="noopener" class="source-pill source-pill--madrid">
+                Contratos Menores Madrid · CC BY 4.0
+              </a>
+              <a href="https://opendata-ajuntament.barcelona.cat/data/es/dataset/perfil-contractant" target="_blank" rel="noopener" class="source-pill source-pill--barcelona">
+                Perfil Contractant Barcelona · CC BY 4.0
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="competition-note reveal">
+          <em>Este trabajo se presenta al Concurso de Reutilización de Datos Abiertos del Ayuntamiento de
+          Madrid 2026 — categoría Servicios web, aplicaciones y visualizaciones.</em>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+const DATA = {"stats":{"madrid_contratos":15778,"madrid_importe":109891395,"barcelona_contratos":62473,"barcelona_importe":201612404,"hhi_mediana_madrid":0.044,"hhi_mediana_barcelona":0.012,"ratio_mediana":3.6,"alertas_fraccionamiento":866,"nifs_alertas":279,"anios":[2023,2024,2025],"madrid_por_ano":{"2023":5719,"2024":5535,"2025":4524},"cpv_cobertura_pct":51.9,"actualizado":"2026-04-28","periodo_label":"2023–2025 (3 años)"},"case_totals":{"gartner_total":527650.75,"gartner_n":4,"gartner_incremento_pct":75.9,"moype_total":711115.41,"moype_n":91,"serintcom_total":262701.05,"serintcom_n":18},"hhi_sector":[{"cpv":"34000000","desc":"Señalización vial","hhi_mad":0.329,"hhi_bcn":0.0083,"ratio":39.8,"n_mad":10,"n_bcn":1059,"importe_mad":73148},{"cpv":"72000000","desc":"Servicios de tecnologías de la información","hhi_mad":0.1028,"hhi_bcn":0.0032,"ratio":31.97,"n_mad":141,"n_bcn":1444,"importe_mad":2264911},{"cpv":"71000000","desc":"Coordinación de seguridad y salud en obras","hhi_mad":0.0454,"hhi_bcn":0.0022,"ratio":20.48,"n_mad":48,"n_bcn":3586,"importe_mad":469251},{"cpv":"22000000","desc":"Libros, publicaciones y prensa","hhi_mad":0.1869,"hhi_bcn":0.0096,"ratio":19.49,"n_mad":43,"n_bcn":1132,"importe_mad":286889},{"cpv":"64000000","desc":"Servicios de mensajería","hhi_mad":0.2164,"hhi_bcn":0.0246,"ratio":8.79,"n_mad":14,"n_bcn":862,"importe_mad":139305},{"cpv":"98000000","desc":"Servicios funerarios","hhi_mad":0.0275,"hhi_bcn":0.0032,"ratio":8.48,"n_mad":47,"n_bcn":3497,"importe_mad":635513},{"cpv":"79000000","desc":"Servicios empresariales y de gestión","hhi_mad":0.0068,"hhi_bcn":0.001,"ratio":7.14,"n_mad":1027,"n_bcn":12276,"importe_mad":8498835},{"cpv":"48000000","desc":"Paquetes de software y sistemas de información","hhi_mad":0.053,"hhi_bcn":0.0096,"ratio":5.51,"n_mad":66,"n_bcn":543,"importe_mad":474858},{"cpv":"32000000","desc":"Equipos de comunicación y telecomunicación","hhi_mad":0.0565,"hhi_bcn":0.0103,"ratio":5.47,"n_mad":72,"n_bcn":1098,"importe_mad":729098},{"cpv":"73000000","desc":"Servicios de investigación y desarrollo","hhi_mad":0.1068,"hhi_bcn":0.0226,"ratio":4.73,"n_mad":14,"n_bcn":84,"importe_mad":131091},{"cpv":"37000000","desc":"Artículos de deporte y equipamiento deportivo","hhi_mad":0.0537,"hhi_bcn":0.0119,"ratio":4.51,"n_mad":421,"n_bcn":651,"importe_mad":2539171},{"cpv":"39000000","desc":"Mobiliario de oficina","hhi_mad":0.0377,"hhi_bcn":0.0095,"ratio":3.98,"n_mad":121,"n_bcn":2510,"importe_mad":707243},{"cpv":"33000000","desc":"Equipamiento médico y de laboratorio","hhi_mad":0.1022,"hhi_bcn":0.0275,"ratio":3.71,"n_mad":49,"n_bcn":384,"importe_mad":430305},{"cpv":"55000000","desc":"Servicios de catering","hhi_mad":0.0584,"hhi_bcn":0.0166,"ratio":3.51,"n_mad":111,"n_bcn":817,"importe_mad":433857},{"cpv":"30000000","desc":"Maquinaria y equipo de oficina e informática","hhi_mad":0.063,"hhi_bcn":0.02,"ratio":3.15,"n_mad":385,"n_bcn":4410,"importe_mad":1935846},{"cpv":"85000000","desc":"Servicios sanitarios","hhi_mad":0.0182,"hhi_bcn":0.0097,"ratio":1.88,"n_mad":307,"n_bcn":463,"importe_mad":2053084},{"cpv":"18000000","desc":"Artículos de confección y accesorios","hhi_mad":0.0246,"hhi_bcn":0.0156,"ratio":1.57,"n_mad":187,"n_bcn":390,"importe_mad":1220404},{"cpv":"80000000","desc":"Servicios de educación y formación","hhi_mad":0.0053,"hhi_bcn":0.0035,"ratio":1.49,"n_mad":1014,"n_bcn":1520,"importe_mad":6507766},{"cpv":"92000000","desc":"Servicios de artes escénicas y musicales","hhi_mad":0.0014,"hhi_bcn":0.001,"ratio":1.48,"n_mad":2853,"n_bcn":7360,"importe_mad":16617445},{"cpv":"77000000","desc":"Mantenimiento de zonas verdes","hhi_mad":0.0401,"hhi_bcn":0.031,"ratio":1.29,"n_mad":36,"n_bcn":110,"importe_mad":372991},{"cpv":"45000000","desc":"Obras de construcción","hhi_mad":0.013,"hhi_bcn":0.0108,"ratio":1.2,"n_mad":446,"n_bcn":2380,"importe_mad":8141991},{"cpv":"50000000","desc":"Servicios de reparación y mantenimiento","hhi_mad":0.0057,"hhi_bcn":0.0059,"ratio":0.96,"n_mad":652,"n_bcn":6072,"importe_mad":4467942},{"cpv":"90000000","desc":"Servicios de gestión medioambiental","hhi_mad":0.0256,"hhi_bcn":0.03,"ratio":0.85,"n_mad":115,"n_bcn":663,"importe_mad":1019605}],"hhi_organo_top20":[{"organo":"COORDINADORA GENERAL DE LA ALCALDÍA","hhi":0.8608,"n":19,"importe":524238,"n_proveedores":13},{"organo":"DIRECTORA GENERAL DE POLÍTICA FINANCIERA","hhi":0.4771,"n":6,"importe":83636,"n_proveedores":3},{"organo":"DIRECTORA GENERAL DE GESTIÓN DEL PATRIMONIO","hhi":0.2515,"n":7,"importe":61187,"n_proveedores":5},{"organo":"DIRECTOR/A DE SEGURIDAD","hhi":0.2378,"n":5,"importe":66705,"n_proveedores":5},{"organo":"DIRECTOR GENERAL DE COORDINACIÓN TERRITORIAL Y  DESCONCENTRACIÓN","hhi":0.2295,"n":9,"importe":83831,"n_proveedores":7},{"organo":"DIRECTORA GENERAL DE POLÍTICAS DE VIVIENDA Y REHABILITACIÓN","hhi":0.2273,"n":8,"importe":92000,"n_proveedores":5},{"organo":"DIRECTOR/A DE RELACIONES INSTITUCIONALES","hhi":0.2229,"n":6,"importe":77259,"n_proveedores":6},{"organo":"BAJA_2023_ELECC_MUNICIPALES COORDINADORA GENERAL DE DISTRITOS, TRANSPARENCIA Y PARTICIPACIÓN CIUDADANA","hhi":0.2161,"n":8,"importe":100084,"n_proveedores":6},{"organo":"DIRECTOR/A GENERAL DE RELACIONES INTERNACIONALES","hhi":0.2028,"n":23,"importe":99560,"n_proveedores":18},{"organo":"DIRECTOR GENERAL DEL INSTITUTO MUNICIPAL DE CONSUMO","hhi":0.187,"n":10,"importe":54919,"n_proveedores":9},{"organo":"DIRECTOR/A DE COMUNICACIÓN, MARKETING Y DIGITALIZACIÓN","hhi":0.1857,"n":16,"importe":77312,"n_proveedores":11},{"organo":"BAJA_2023_ELEC_MUN_COORDINADOR GENERAL DE ECONOMÍA, COMERCIO, CONSUMO Y PARTENARIADO","hhi":0.1811,"n":7,"importe":81757,"n_proveedores":6},{"organo":"BAJA C.O. 2023 DIRECTOR GENERAL DE COOPERACIÓN Y CIUDADANÍA GLOBAL","hhi":0.1739,"n":8,"importe":73374,"n_proveedores":7},{"organo":"SECRETARIO GENERAL DEL PLENO","hhi":0.164,"n":113,"importe":328631,"n_proveedores":17},{"organo":"BAJA_2023_ELEC_MUN_DIRECTORA GENERAL DE COMERCIO Y HOSTELERÍA","hhi":0.151,"n":10,"importe":87449,"n_proveedores":10},{"organo":"BAJA_2023_ELEC  MUN_SECRETARIO GENERAL TÉCNICO DEL ÁREA DE GOBIERNO DE MEDIO AMBIENTE Y MOVILIDAD","hhi":0.1482,"n":9,"importe":68312,"n_proveedores":8},{"organo":"BAJA_2023_ELEC_MUN_SECRETARIA GENERAL TÉCNICA DEL ÁREA DE GOBIERNO DE DESARROLLO URBANO","hhi":0.1443,"n":13,"importe":86321,"n_proveedores":12},{"organo":"TITULAR DEL ÁREA DELEGADA DE TURISMO","hhi":0.1436,"n":12,"importe":89656,"n_proveedores":12},{"organo":"DIRECTOR GENERAL DE CONSERVACIÓN DE VÍAS PÚBLICAS","hhi":0.1336,"n":10,"importe":119049,"n_proveedores":9},{"organo":"BAJA_2023_ELEC_MUN_DIRECTOR GENERAL DE INNOVACIÓN Y EMPRENDIMIENTO","hhi":0.1178,"n":24,"importe":193621,"n_proveedores":21}],"fraccionamiento_top30":[{"nif":"B50776947","razon_social":"IMPLASER 99,S.L.","tipo":"Obras","organo":"COORDINADOR DEL DISTRITO DE MONCLOA-ARAVACA","fecha":"2023-12-19","n_contratos":5,"suma_sin_iva":145940,"umbral":40000,"exceso":105940},{"nif":"A78111549","razon_social":"MOYPE SPORT SA","tipo":"Suministros","organo":"COORDINADOR DEL DISTRITO DE MONCLOA-ARAVACA","fecha":"2025-10-09","n_contratos":11,"suma_sin_iva":98566,"umbral":15000,"exceso":83566},{"nif":"B80345721","razon_social":"J C MADRID DEPORTE Y CULTURA S.L.","tipo":"Servicios","organo":"COORDINADORA DEL DISTRITO DE CENTRO","fecha":"2024-11-06","n_contratos":8,"suma_sin_iva":89516,"umbral":15000,"exceso":74516},{"nif":"A58417346","razon_social":"Aranzadi La Ley, S.A.U.","tipo":"Servicios","organo":"DIRECTOR GENERAL DE BIBLIOTECAS, ARCHIVOS Y MUSEOS ","fecha":"2025-12-15","n_contratos":2,"suma_sin_iva":87868,"umbral":15000,"exceso":72868},{"nif":"B28281095","razon_social":"SERRAZAR, S.L.","tipo":"Obras","organo":"GERENTE MADRID SALUD","fecha":"2024-06-13","n_contratos":3,"suma_sin_iva":111360,"umbral":40000,"exceso":71360},{"nif":"A78111549","razon_social":"MOYPE SPORT SA","tipo":"Suministros","organo":"COORDINADORA DEL DISTRITO DE VILLAVERDE","fecha":"2025-10-13","n_contratos":10,"suma_sin_iva":83849,"umbral":15000,"exceso":68849},{"nif":"A78111549","razon_social":"MOYPE SPORT SA","tipo":"Suministros","organo":"COORDINADOR DEL DISTRITO DE BARAJAS","fecha":"2024-10-15","n_contratos":11,"suma_sin_iva":75024,"umbral":15000,"exceso":60024},{"nif":"A79102331","razon_social":"UNIDAD EDITORIAL; S.A.","tipo":"Suministros","organo":"COORDINADORA GENERAL DE CULTURA","fecha":"2025-12-16","n_contratos":2,"suma_sin_iva":74456,"umbral":15000,"exceso":59456},{"nif":"A78111549","razon_social":"MOYPE SPORT SA","tipo":"Suministros","organo":"COORDINADOR DEL DISTRITO DE TETUÁN","fecha":"2024-10-24","n_contratos":9,"suma_sin_iva":73578,"umbral":15000,"exceso":58578},{"nif":"B59416479","razon_social":"HARTFORD, S.L.","tipo":"Servicios","organo":"COORDINADORA DEL DISTRITO DE CENTRO","fecha":"2024-10-23","n_contratos":6,"suma_sin_iva":73428,"umbral":15000,"exceso":58428},{"nif":"B87522702","razon_social":"GESTIÓN INTEGRAL ALDIBA S.L.","tipo":"Obras","organo":"COORDINADOR DEL DISTRITO DE MONCLOA-ARAVACA","fecha":"2024-07-03","n_contratos":3,"suma_sin_iva":98357,"umbral":40000,"exceso":58357},{"nif":"A78111549","razon_social":"MOYPE SPORT SA","tipo":"Suministros","organo":"COORDINADORA DEL DISTRITO DE PUENTE DE VALLECAS","fecha":"2025-10-16","n_contratos":9,"suma_sin_iva":70369,"umbral":15000,"exceso":55369},{"nif":"A79816690","razon_social":"GLOBAL MEDIA & ENTERTAINMENT, S.A.U.","tipo":"Servicios","organo":"SECRETARIA GENERAL TÉCNICA DE POLÍTICAS DE VIVIENDA","fecha":"2024-02-22","n_contratos":7,"suma_sin_iva":69427,"umbral":15000,"exceso":54427},{"nif":"B84851278","razon_social":"GESTIÓN INTEGRAL DE OFICINAS, S.L.","tipo":"Suministros","organo":"DIRECTORA GENERAL DE EMPRENDIMIENTO","fecha":"2025-07-18","n_contratos":7,"suma_sin_iva":68178,"umbral":15000,"exceso":53178},{"nif":"B84851278","razon_social":"GESTIÓN INTEGRAL DE OFICINAS, S.L.","tipo":"Suministros","organo":"COORDINADORA DEL DISTRITO DE VILLAVERDE","fecha":"2025-10-15","n_contratos":10,"suma_sin_iva":66239,"umbral":15000,"exceso":51239},{"nif":"A79816690","razon_social":"GLOBAL MEDIA & ENTERTAINMENT, S.A.U.","tipo":"Servicios","organo":"CONSEJERO/A DELEGADO/A","fecha":"2024-02-28","n_contratos":6,"suma_sin_iva":64677,"umbral":15000,"exceso":49677},{"nif":"A78557808","razon_social":"DISTRIBUIDORA DE MATERIAL DE OFICINA, S.A.","tipo":"Suministros","organo":"COORDINADOR DEL DISTRITO DE FUENCARRAL-EL PARDO","fecha":"2024-03-18","n_contratos":7,"suma_sin_iva":62321,"umbral":15000,"exceso":47321},{"nif":"A78111549","razon_social":"MOYPE SPORT SA","tipo":"Suministros","organo":"COORDINADOR DEL DISTRITO DE SALAMANCA","fecha":"2025-10-17","n_contratos":8,"suma_sin_iva":62011,"umbral":15000,"exceso":47011},{"nif":"A78111549","razon_social":"MOYPE SPORT SA","tipo":"Suministros","organo":"COORDINADOR DEL DISTRITO DE TETUÁN","fecha":"2024-10-29","n_contratos":7,"suma_sin_iva":60425,"umbral":15000,"exceso":45425},{"nif":"B81650137","razon_social":"YEIYEBA, S.L.","tipo":"Servicios","organo":"COORDINADOR DEL DISTRITO DE CIUDAD LINEAL","fecha":"2024-05-07","n_contratos":6,"suma_sin_iva":60048,"umbral":15000,"exceso":45048},{"nif":"A79816690","razon_social":"GLOBAL MEDIA & ENTERTAINMENT, S.A.U.","tipo":"Servicios","organo":"DIRECTOR GENERAL DE PLANIFICACIÓN DE RECURSOS HUMANOS","fecha":"2024-02-29","n_contratos":5,"suma_sin_iva":59927,"umbral":15000,"exceso":44927},{"nif":"B87083200","razon_social":"DISORDER EVENTS S.L.","tipo":"Servicios","organo":"COORDINADOR DEL DISTRITO DE MORATALAZ","fecha":"2025-05-13","n_contratos":5,"suma_sin_iva":59642,"umbral":15000,"exceso":44642},{"nif":"B28475002","razon_social":"COMERCIAL DE SUMINISTROS PARA LA INFORMATICA S.L.","tipo":"Suministros","organo":"COORDINADOR DEL DISTRITO DE LATINA","fecha":"2023-02-03","n_contratos":10,"suma_sin_iva":59512,"umbral":15000,"exceso":44512},{"nif":"B88454962","razon_social":"EVENTOS INFIMA,S.L.","tipo":"Servicios","organo":"COORDINADOR DEL DISTRITO DE TETUÁN","fecha":"2024-03-14","n_contratos":6,"suma_sin_iva":59355,"umbral":15000,"exceso":44355},{"nif":"A58417346","razon_social":"LA LEY SOLUCIONES LEGALES, S.A.","tipo":"Servicios","organo":"DIRECTORA DE LA AGENCIA TRIBUTARIA MADRID","fecha":"2023-11-14","n_contratos":2,"suma_sin_iva":59173,"umbral":15000,"exceso":44173},{"nif":"A28855260","razon_social":"INETUM ESPAÑA, S.A.","tipo":"Servicios","organo":"DIRECTOR GENERAL DE PLANIFICACIÓN DE RECURSOS HUMANOS","fecha":"2025-05-30","n_contratos":9,"suma_sin_iva":57761,"umbral":15000,"exceso":42761},{"nif":"A78557808","razon_social":"DISTRIBUIDORA DE MATERIAL DE OFICINA, S.A.","tipo":"Suministros","organo":"COORDINADOR DEL DISTRITO DE FUENCARRAL-EL PARDO","fecha":"2023-02-21","n_contratos":11,"suma_sin_iva":57665,"umbral":15000,"exceso":42665},{"nif":"B84851278","razon_social":"GESTIÓN INTEGRAL DE OFICINAS, S.L.","tipo":"Suministros","organo":"COORDINADOR DEL DISTRITO DE CHAMBERÍ","fecha":"2025-07-29","n_contratos":6,"suma_sin_iva":56539,"umbral":15000,"exceso":41539},{"nif":"A28855260","razon_social":"INETUM ESPAÑA, S.A.","tipo":"Servicios","organo":"DIRECTOR GENERAL DE PLANIFICACIÓN DE RECURSOS HUMANOS","fecha":"2024-02-14","n_contratos":9,"suma_sin_iva":56445,"umbral":15000,"exceso":41445},{"nif":"A79816690","razon_social":"GLOBAL MEDIA Y ENTERTAINMENT SPAIN, S.A.U.","tipo":"Servicios","organo":"COORDINADOR DEL DISTRITO DE TETUÁN","fecha":"2025-03-10","n_contratos":5,"suma_sin_iva":56238,"umbral":15000,"exceso":41238}],"gartner":[{"fecha":"2023-03-22","importe":127655,"organo":"COORDINADORA GENERAL DE LA ALCALDÍA","ano":2023,"objeto":"SUSCRIPCIÓN A LA BASE DE DATOS GARTNER DE CONOCIMIENTO ESTRATÉGICO EN MATERIAS DE TECNOLOGÍAS DE LA INFORMACIÓN Y LAS CO"},{"fecha":"2024-03-06","importe":134038,"organo":"COORDINADORA GENERAL DE LA ALCALDÍA","ano":2024,"objeto":"CONTRATO PRIVADO PARA LA SUSCRIPCIÓN A LA BASE DE DATOS GARTNER DE CONOCIMIENTO ESTRATÉGICO EN MATERIAS DE TECNOLOGÍAS D"},{"fecha":"2024-09-26","importe":41442,"organo":"DIRECTOR GENERAL DE LA OFICINA DIGITAL","ano":2024,"objeto":"SUSCRIPCIÓN A LA BASE DE DATOS GARTNER DE CONOCIMIENTO ESTRATÉGICO EN MATERIAS DE CYBERSEGURIDAD"},{"fecha":"2025-03-24","importe":224516,"organo":"COORDINADORA GENERAL DE LA ALCALDÍA","ano":2025,"objeto":"SUSCRIPCIÓN A LAS BASES DE DATOS GARTNER: DE CONOCIMIENTO ESTRATÉGICO EN MATERIAS DE TECNOLOGÍAS DE LA INFORMACIÓN Y LAS"}],"moype_distritos":[{"distrito":"LATINA","organo":"COORDINADOR DEL DISTRITO DE LATINA","n_contratos":13,"importe":143457},{"distrito":"MORATALAZ","organo":"COORDINADOR DEL DISTRITO DE MORATALAZ","n_contratos":8,"importe":91665},{"distrito":"TETUÁN","organo":"COORDINADOR DEL DISTRITO DE TETUÁN","n_contratos":14,"importe":63060},{"distrito":"FUENCARRAL-EL PARDO","organo":"COORDINADOR DEL DISTRITO DE FUENCARRAL-EL PARDO","n_contratos":5,"importe":63035},{"distrito":"BARAJAS","organo":"COORDINADOR DEL DISTRITO DE BARAJAS","n_contratos":10,"importe":61006},{"distrito":"SALAMANCA","organo":"COORDINADOR DEL DISTRITO DE SALAMANCA","n_contratos":6,"importe":53480},{"distrito":"VILLAVERDE","organo":"COORDINADORA DEL DISTRITO DE VILLAVERDE","n_contratos":7,"importe":42063},{"distrito":"USERA","organo":"COORDINADOR DEL DISTRITO DE USERA","n_contratos":4,"importe":37824},{"distrito":"ARGANZUELA","organo":"COORDINADOR DEL DISTRITO DE ARGANZUELA","n_contratos":3,"importe":26413},{"distrito":"MONCLOA-ARAVACA","organo":"COORDINADOR DEL DISTRITO DE MONCLOA-ARAVACA","n_contratos":2,"importe":19256},{"distrito":"HORTALEZA","organo":"COORDINADOR DEL DISTRITO DE HORTALEZA","n_contratos":1,"importe":17732},{"distrito":"VICÁLVARO","organo":"COORDINADORA DEL DISTRITO DE VICÁLVARO","n_contratos":1,"importe":16630},{"distrito":"CHAMARTÍN","organo":"COORDINADOR DEL DISTRITO DE CHAMARTÍN","n_contratos":2,"importe":12824},{"distrito":"CHAMARTÍN","organo":"COORDINADORA DEL DISTRITO DE CHAMARTÍN","n_contratos":1,"importe":12764},{"distrito":"CARABANCHEL","organo":"COORDINADORA DEL DISTRITO DE CARABANCHEL","n_contratos":1,"importe":12188},{"distrito":"PUENTE DE VALLECAS","organo":"COORDINADORA DEL DISTRITO DE PUENTE DE VALLECAS","n_contratos":1,"importe":10113},{"distrito":"SAN BLAS - CANILLEJAS","organo":"COORDINADOR DEL DISTRITO DE SAN BLAS - CANILLEJAS","n_contratos":2,"importe":8023},{"distrito":"VILLA DE VALLECAS","organo":"COORDINADORA DEL DISTRITO DE VILLA DE VALLECAS","n_contratos":2,"importe":6568},{"distrito":"DIRECTOR GENERAL DE DEPORTE","organo":"DIRECTOR GENERAL DE DEPORTE","n_contratos":1,"importe":5661},{"distrito":"CIUDAD LINEAL","organo":"COORDINADOR DEL DISTRITO DE CIUDAD LINEAL","n_contratos":1,"importe":4580},{"distrito":"DIRECTOR/A DE DEPORTES","organo":"DIRECTOR/A DE DEPORTES","n_contratos":4,"importe":3869},{"distrito":"DIRECTORA GENERAL DE INCLUSIÓN SOCIAL Y COOPERACIÓN AL DESARROLLO","organo":"DIRECTORA GENERAL DE INCLUSIÓN SOCIAL Y COOPERACIÓN AL DESARROLLO","n_contratos":1,"importe":543},{"distrito":"DIRECTOR GENERAL DE POLICÍA MUNICIPAL","organo":"DIRECTOR GENERAL DE POLICÍA MUNICIPAL","n_contratos":2,"importe":285}],"moype_total":711115.41,"serintcom":[{"fecha":"2023-03-27","importe_sin_iva":14856.0,"tipo":"Servicios","umbral":15000,"objeto":"COLABORAR EN LA GESTIÓN DE LAS REDES SOCIALES DEL ORGANISMO AUTÓNOMO MADRID SALU","supera_umbral":false},{"fecha":"2023-07-20","importe_sin_iva":14841.2,"tipo":"Suministros","umbral":15000,"objeto":"SUMINISTRO PARA LA ADQUISICIÓN DE OBJETOS DE MERCHANDISING PARA EL ORGANISMO AUT","supera_umbral":false},{"fecha":"2023-11-28","importe_sin_iva":14850.0,"tipo":"Servicios","umbral":15000,"objeto":"TRABAJO TÉCNICO DE APOYO EN LA PRODUCCIÓN Y GESTIÓN DE CONTENIDOS AUDIOVISUALES ","supera_umbral":false},{"fecha":"2023-12-15","importe_sin_iva":3969.0,"tipo":"Suministros","umbral":15000,"objeto":"SUMINISTRO DE BOLSAS SERIGRAFIADAS CON FIN PUBLICITARIO DE LOS DIFERENTES SERVIC","supera_umbral":false},{"fecha":"2024-02-14","importe_sin_iva":14750.0,"tipo":"Suministros","umbral":15000,"objeto":"SUMINISTRO DE HERRAMIENTAS PARA POSICIONAMIENTO WEB, GESTIÓN DE REDES SOCIALES, ","supera_umbral":false},{"fecha":"2024-03-13","importe_sin_iva":14856.0,"tipo":"Servicios","umbral":15000,"objeto":"COLABORAR EN LA GESTIÓN DE LAS REDES SOCIALES DEL ORGANISMO AUTÓNOMO MADRID SALU","supera_umbral":false},{"fecha":"2024-04-09","importe_sin_iva":2975.0,"tipo":"Servicios","umbral":15000,"objeto":"REALIZACIÓN DE UN PROYECTO QUE RECOJA LAS NECESIDADES DE SEÑALÉTICA DEL ORGANISM","supera_umbral":false},{"fecha":"2024-06-21","importe_sin_iva":14575.0,"tipo":"Servicios","umbral":15000,"objeto":"TRABAJO TÉCNICO DE EDICIÓN Y POST PRODUCCIÓN DE PIEZAS AUDIOVISUALES DE LA SUBDI","supera_umbral":false},{"fecha":"2024-08-06","importe_sin_iva":5595.0,"tipo":"Suministros","umbral":15000,"objeto":"SUMINISTRO DE MATERIALES DE APOYO A LAS ACTIVIDADES DE COMUNICACIÓN INTERNA","supera_umbral":false},{"fecha":"2024-09-24","importe_sin_iva":425.6,"tipo":"Suministros","umbral":15000,"objeto":"SUMINISTRO DE CINTAS (LANDYARDS) CON LA IMAGEN CORPORATIVA PARA LA DIRECCIÓN GEN","supera_umbral":false},{"fecha":"2024-10-22","importe_sin_iva":14850.0,"tipo":"Servicios","umbral":15000,"objeto":"TRABAJO TÉCNICO DE APOYO EN LA PRODUCCIÓN Y GESTIÓN DE CONTENIDOS AUDIOVISUALES ","supera_umbral":false},{"fecha":"2024-12-05","importe_sin_iva":14800.0,"tipo":"Suministros","umbral":15000,"objeto":"SUMINISTRO DE HERRAMIENTAS PARA POSICIONAMIENTO WEB, GESTIÓN DE REDES SOCIALES, ","supera_umbral":false},{"fecha":"2024-12-12","importe_sin_iva":14990.0,"tipo":"Suministros","umbral":15000,"objeto":"SUMINISTRO DE LICENCIAS ADOBE CREATIVE CLOUD PARA MADRID SALUD, A TRAVÉS DE LA I","supera_umbral":false},{"fecha":"2025-04-29","importe_sin_iva":14925.0,"tipo":"Suministros","umbral":15000,"objeto":"Suministro de materiales de apoyo específicos para el programa de Alimentación y","supera_umbral":false},{"fecha":"2025-05-14","importe_sin_iva":13920.0,"tipo":"Servicios","umbral":15000,"objeto":"Servicio para colaborar en la gestión de las redes sociales del Organismo Autóno","supera_umbral":false},{"fecha":"2025-06-27","importe_sin_iva":12280.5,"tipo":"Suministros","umbral":15000,"objeto":" Adquisición de objetos de materiales de apoyo a la Campaña de Madrid dermosalud","supera_umbral":false},{"fecha":"2025-08-04","importe_sin_iva":14800.0,"tipo":"Servicios","umbral":15000,"objeto":"Servicio para la elaboración de contenidos audiovisuales sobre diferentes servic","supera_umbral":false},{"fecha":"2025-10-17","importe_sin_iva":14850.0,"tipo":"Servicios","umbral":15000,"objeto":"Servicio para un trabajo técnico de apoyo en la producción y gestión de contenid","supera_umbral":false}],"implaser":[{"fecha":"2023-12-19","importe_sin_iva":34377.02,"importe_iva":41596.19,"tipo":"Obras","umbral":40000,"organo":"COORDINADOR DEL DISTRITO DE MONCLOA-ARAVACA","objeto":"CONTRATO MENOR DE OBRAS PARA LA ADECUACIÓN Y MEJORA DE LA ACCESIBILIDAD DEL CENT"},{"fecha":"2023-12-19","importe_sin_iva":23734.75,"importe_iva":28719.05,"tipo":"Obras","umbral":40000,"organo":"COORDINADOR DEL DISTRITO DE MONCLOA-ARAVACA","objeto":"CONTRATO MENOR DE OBRAS PARA LA ADECUACIÓN Y MEJORA DE LA ACCESIBILIDAD INTERIOR"},{"fecha":"2023-12-19","importe_sin_iva":34286.11,"importe_iva":41486.19,"tipo":"Obras","umbral":40000,"organo":"COORDINADOR DEL DISTRITO DE MONCLOA-ARAVACA","objeto":"CONTRATO MENOR DE OBRAS PARA LA ADECUACIÓN Y MEJORA DE LA ACCESIBILIDAD INTERIOR"},{"fecha":"2023-12-19","importe_sin_iva":19101.81,"importe_iva":23113.19,"tipo":"Obras","umbral":40000,"organo":"COORDINADOR DEL DISTRITO DE MONCLOA-ARAVACA","objeto":"CONTRATO MENOR DE OBRAS PARA LA ADECUACIÓN Y MEJORA DE LA ACCESIBILIDAD INTERIOR"},{"fecha":"2023-12-19","importe_sin_iva":34440.53,"importe_iva":41673.04,"tipo":"Obras","umbral":40000,"organo":"COORDINADOR DEL DISTRITO DE MONCLOA-ARAVACA","objeto":"CONTRATO MENOR DE OBRAS PARA LA MEJORA DE LA ACCESIBILIDAD INTERIOR DEL CENTRO M"}]};
+
+    const progressBar = document.getElementById('progress-bar');
+    function updateProgress() {
+      const h = document.documentElement;
+      const total = h.scrollHeight - window.innerHeight;
+      progressBar.style.width = total > 0 ? (window.scrollY / total * 100) + '%' : '0%';
+    }
+    window.addEventListener('scroll', updateProgress, { passive: true });
+
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) { e.target.classList.add('visible'); revealObserver.unobserve(e.target); }
+      });
+    }, { threshold: 0.15 });
+
+    function initReveal() {
+      document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+    }
+
+    const tocLinks = document.querySelectorAll('#toc a');
+    const tocObserver = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          const id = e.target.id;
+          tocLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + id));
+        }
+      });
+    }, { rootMargin: '-40% 0px -55% 0px' });
+    document.querySelectorAll('section[id]').forEach(s => tocObserver.observe(s));
+
+    function animateCounter(el, target, duration) {
+      const start = performance.now();
+      (function tick(now) {
+        const p = Math.min((now - start) / duration, 1);
+        const eased = p === 1 ? 1 : 1 - Math.pow(2, -10 * p);
+        el.textContent = Math.round(target * eased).toLocaleString('es-ES');
+        if (p < 1) requestAnimationFrame(tick);
+      })(performance.now());
+    }
+
+    const fmt = {
+      eur: d => '\u20ac' + Math.round(d).toLocaleString('es-ES'),
+      ratio: d => d.toFixed(1) + 'x',
+    };
+
+    // ── Case charts (B70-B72) ─────────────────────────────────────────
+    function drawGartnerChart() {
+      const el = document.getElementById('gartner-chart');
+      if (!el || el.querySelector('svg')) return;
+      const data = DATA.gartner;
+      const years = {};
+      data.forEach(d => {
+        if (!years[d.ano]) years[d.ano] = 0;
+        years[d.ano] += d.importe;
+      });
+      const yData = Object.entries(years).map(([y, v]) => ({ year: +y, importe: v })).sort((a,b) => a.year - b.year);
+
+      const margin = { top: 20, right: 30, bottom: 36, left: 70 };
+      const w = el.clientWidth || 500;
+      const h = 200;
+      const innerW = w - margin.left - margin.right;
+      const innerH = h - margin.top - margin.bottom;
+
+      const x = d3.scalePoint().domain(yData.map(d => String(d.year))).range([0, innerW]).padding(0.5);
+      const y = d3.scaleLinear().domain([0, d3.max(yData, d => d.importe) * 1.15]).range([innerH, 0]);
+
+      const svg = d3.select(el).append('svg').attr('width', w).attr('height', h);
+      const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
+
+      // Line
+      const line = d3.line().x(d => x(String(d.year))).y(d => y(d.importe)).curve(d3.curveMonotoneX);
+      const path = g.append('path').datum(yData).attr('fill', 'none')
+        .attr('stroke', 'var(--accent)').attr('stroke-width', 2.5).attr('d', line);
+      const len = path.node().getTotalLength();
+      path.attr('stroke-dasharray', len).attr('stroke-dashoffset', len)
+        .transition().duration(1200).ease(d3.easeCubicOut).attr('stroke-dashoffset', 0);
+
+      // Points + labels
+      yData.forEach((d, i) => {
+        const cx = x(String(d.year)), cy = y(d.importe);
+        g.append('circle').attr('cx', cx).attr('cy', cy).attr('r', 0)
+          .attr('fill', 'var(--accent)').attr('stroke', 'var(--bg-elevated)').attr('stroke-width', 2)
+          .transition().delay(1200 + i * 100).duration(300).attr('r', 6);
+        g.append('text').attr('x', cx).attr('y', cy - 12)
+          .attr('text-anchor', 'middle').attr('fill', 'var(--accent)').attr('font-size', 10).attr('opacity', 0)
+          .text('€' + Math.round(d.importe / 1000) + 'k')
+          .transition().delay(1200 + i * 100).duration(300).attr('opacity', 1);
+      });
+
+      // +76% annotation
+      g.append('text').attr('x', innerW).attr('y', 14)
+        .attr('text-anchor', 'end').attr('fill', 'var(--accent)').attr('font-size', 12).attr('font-weight', 700)
+        .text('+76% →').attr('opacity', 0)
+        .transition().delay(1800).duration(400).attr('opacity', 1);
+
+      g.append('g').attr('transform', `translate(0,${innerH})`)
+        .call(d3.axisBottom(x))
+        .call(gg => gg.selectAll('text').attr('fill', 'var(--text-secondary)').attr('font-size', 11))
+        .call(gg => gg.select('.domain').attr('stroke', 'var(--border)'));
+      g.append('g')
+        .call(d3.axisLeft(y).ticks(3).tickFormat(d => '€' + (d/1000).toFixed(0) + 'k'))
+        .call(gg => gg.selectAll('text').attr('fill', 'var(--text-secondary)').attr('font-size', 10))
+        .call(gg => gg.select('.domain').attr('stroke', 'var(--border)'));
+    }
+
+    function drawMoypeChart() {
+      const el = document.getElementById('moype-chart');
+      if (!el || el.querySelector('svg')) return;
+      const data = DATA.moype_distritos.slice(0, 12);
+      const margin = { top: 12, right: 80, bottom: 20, left: 110 };
+      const w = el.clientWidth || 500;
+      const barH = 20, gap = 4;
+      const h = data.length * (barH + gap) + margin.top + margin.bottom;
+      const innerW = w - margin.left - margin.right;
+      const x = d3.scaleLinear().domain([0, data[0].importe * 1.05]).range([0, innerW]);
+
+      const svg = d3.select(el).append('svg').attr('width', w).attr('height', h);
+      const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
+
+      data.forEach((d, i) => {
+        const y = i * (barH + gap);
+        const label = d.distrito.substring(0, 16);
+        g.append('text').attr('x', -8).attr('y', y + barH / 2)
+          .attr('text-anchor', 'end').attr('fill', 'var(--text-secondary)').attr('font-size', 10).attr('dominant-baseline', 'middle')
+          .text(label);
+        const bar = g.append('rect').attr('x', 0).attr('y', y).attr('height', barH)
+          .attr('fill', 'var(--madrid)').attr('rx', 2).attr('opacity', 0.7).attr('width', 0);
+        bar.transition().delay(i * 50).duration(700).ease(d3.easeCubicOut).attr('width', x(d.importe));
+        g.append('text').attr('x', x(d.importe) + 4).attr('y', y + barH / 2)
+          .attr('fill', 'var(--text-muted)').attr('font-size', 9).attr('dominant-baseline', 'middle')
+          .attr('opacity', 0).text('€' + Math.round(d.importe / 1000) + 'k')
+          .transition().delay(i * 50 + 700).duration(200).attr('opacity', 1);
+      });
+    }
+
+    function drawSerintcomChart() {
+      const el = document.getElementById('serintcom-chart');
+      if (!el || el.querySelector('svg')) return;
+      const data = DATA.serintcom;
+      const margin = { top: 20, right: 30, bottom: 40, left: 70 };
+      const w = el.clientWidth || 500;
+      const h = 200;
+      const innerW = w - margin.left - margin.right;
+      const innerH = h - margin.top - margin.bottom;
+
+      const parseDate = d3.timeParse('%Y-%m-%d');
+      const dates = data.map(d => parseDate(d.fecha)).filter(Boolean);
+      const x = d3.scaleTime().domain(d3.extent(dates)).range([0, innerW]);
+      const y = d3.scaleLinear().domain([0, 16000]).range([innerH, 0]);
+
+      const svg = d3.select(el).append('svg').attr('width', w).attr('height', h);
+      const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
+
+      // Threshold line €15.000
+      const threshY = y(15000);
+      g.append('line').attr('x1', 0).attr('x2', innerW).attr('y1', threshY).attr('y2', threshY)
+        .attr('stroke', 'var(--alert)').attr('stroke-dasharray', '6 3').attr('stroke-width', 1.5);
+      g.append('text').attr('x', innerW).attr('y', threshY - 6)
+        .attr('text-anchor', 'end').attr('fill', 'var(--alert)').attr('font-size', 10)
+        .text('Umbral LCSP €15.000');
+
+      // Points (appear one by one)
+      data.forEach((d, i) => {
+        const cx = x(parseDate(d.fecha));
+        const cy = y(d.importe_sin_iva);
+        const dot = g.append('circle').attr('cx', cx).attr('cy', innerH).attr('r', 5)
+          .attr('fill', 'var(--barcelona)').attr('opacity', 0.8);
+        dot.append('title').text(`${d.fecha}\n€${d.importe_sin_iva.toLocaleString('es-ES')} sin IVA\n${d.objeto}`);
+        dot.transition().delay(i * 120).duration(400).ease(d3.easeCubicOut).attr('cy', cy);
+      });
+
+      // Badge "0/18 supera umbral"
+      g.append('rect').attr('x', 4).attr('y', 4).attr('width', 170).attr('height', 22)
+        .attr('fill', 'var(--alert-dim)').attr('rx', 4).attr('opacity', 0);
+      g.append('text').attr('x', 10).attr('y', 19)
+        .attr('fill', 'var(--alert)').attr('font-size', 10).attr('font-weight', 600)
+        .attr('opacity', 0).text('0 de 18 contratos supera el umbral')
+        .transition().delay(data.length * 120 + 400).duration(400).attr('opacity', 1);
+
+      // Axes
+      g.append('g').attr('transform', `translate(0,${innerH})`)
+        .call(d3.axisBottom(x).ticks(6).tickFormat(d3.timeFormat('%m/%Y')))
+        .call(gg => gg.selectAll('text').attr('fill', 'var(--text-secondary)').attr('font-size', 9).attr('transform', 'rotate(-25)').attr('text-anchor', 'end'))
+        .call(gg => gg.select('.domain').attr('stroke', 'var(--border)'));
+      g.append('g')
+        .call(d3.axisLeft(y).ticks(3).tickFormat(d => '€' + (d/1000).toFixed(0) + 'k'))
+        .call(gg => gg.selectAll('text').attr('fill', 'var(--text-secondary)').attr('font-size', 10))
+        .call(gg => gg.select('.domain').attr('stroke', 'var(--border)'));
+    }
+
+    function drawImplaserChart() {
+      const el = document.getElementById('implaser-chart');
+      if (!el || el.querySelector('svg')) return;
+      const data = DATA.implaser || [];
+      if (!data.length) return;
+
+      // Build cumulative series
+      let running = 0;
+      const cum = data.map((d, i) => {
+        const prev = running;
+        running += d.importe_sin_iva;
+        return { i, individual: d.importe_sin_iva, prev, total: running, objeto: d.objeto };
+      });
+      const grandTotal = running;
+      const UMBRAL = 40000;
+
+      const margin = { top: 28, right: 16, bottom: 50, left: 64 };
+      const w = el.clientWidth || 500;
+      const h = 240;
+      const innerW = w - margin.left - margin.right;
+      const innerH = h - margin.top - margin.bottom;
+
+      const xBand = d3.scaleBand()
+        .domain(cum.map(c => `C${c.i + 1}`))
+        .range([0, innerW]).padding(0.35);
+      const yMax = grandTotal * 1.12;
+      const y = d3.scaleLinear().domain([0, yMax]).range([innerH, 0]);
+
+      const svg = d3.select(el).append('svg').attr('width', w).attr('height', h);
+      const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
+
+      // Subtitle
+      svg.append('text').attr('x', margin.left).attr('y', 14)
+        .attr('fill', 'var(--text-muted)').attr('font-size', 10)
+        .text('Suma acumulada tras cada contrato · 5 obras adjudicadas el 19-dic-2023');
+
+      // Y grid
+      g.append('g')
+        .call(d3.axisLeft(y).ticks(5).tickSize(-innerW).tickFormat(''))
+        .call(gg => gg.selectAll('line').attr('stroke', 'var(--border)').attr('stroke-width', 0.5).attr('opacity', 0.5))
+        .call(gg => gg.select('.domain').remove());
+
+      // Threshold line at €40k
+      const threshY = y(UMBRAL);
+      g.append('line').attr('x1', 0).attr('x2', innerW).attr('y1', threshY).attr('y2', threshY)
+        .attr('stroke', 'var(--alert)').attr('stroke-dasharray', '6 3').attr('stroke-width', 1.5);
+      g.append('text').attr('x', 4).attr('y', threshY - 5)
+        .attr('fill', 'var(--alert)').attr('font-size', 9).attr('font-weight', 600)
+        .text('Umbral LCSP obras · €40.000');
+
+      // Bars: each column shows cumulative split into safe/alert segments
+      const bw = xBand.bandwidth();
+      cum.forEach((c, i) => {
+        const cx = xBand(`C${i + 1}`);
+        const exceeds = c.total > UMBRAL;
+        const safeTop = y(Math.min(c.total, UMBRAL));
+        const safeH = innerH - safeTop;
+        const alertTop = exceeds ? y(c.total) : null;
+        const alertH = exceeds ? safeTop - alertTop : 0;
+
+        // Safe portion (madrid color)
+        const safeBar = g.append('rect').attr('x', cx).attr('y', innerH).attr('width', bw).attr('height', 0)
+          .attr('fill', 'var(--madrid)').attr('opacity', 0.55).attr('rx', 2);
+        safeBar.transition().delay(i * 200).duration(500).ease(d3.easeCubicOut)
+          .attr('y', safeTop).attr('height', safeH);
+
+        // Alert portion (above threshold)
+        if (exceeds) {
+          const alertBar = g.append('rect').attr('x', cx).attr('y', safeTop).attr('width', bw).attr('height', 0)
+            .attr('fill', 'var(--alert)').attr('opacity', 0.85).attr('rx', 2);
+          alertBar.transition().delay(i * 200 + 150).duration(500).ease(d3.easeCubicOut)
+            .attr('y', alertTop).attr('height', alertH);
+        }
+
+        // Individual contract amount (below bar)
+        g.append('text').attr('x', cx + bw / 2).attr('y', innerH + 14)
+          .attr('text-anchor', 'middle').attr('fill', 'var(--text-secondary)')
+          .attr('font-size', 9).attr('font-family', 'var(--font-mono)')
+          .text(`C${i + 1}`);
+        g.append('text').attr('x', cx + bw / 2).attr('y', innerH + 26)
+          .attr('text-anchor', 'middle').attr('fill', 'var(--text-muted)')
+          .attr('font-size', 8).attr('font-family', 'var(--font-mono)')
+          .text(`+€${(c.individual / 1000).toFixed(1)}k`);
+
+        // Cumulative total on top of bar
+        g.append('text').attr('x', cx + bw / 2).attr('y', y(c.total) - 6)
+          .attr('text-anchor', 'middle').attr('fill', exceeds ? 'var(--alert)' : 'var(--text-primary)')
+          .attr('font-size', 10).attr('font-weight', 600).attr('font-family', 'var(--font-mono)')
+          .attr('opacity', 0)
+          .text(`€${(c.total / 1000).toFixed(1)}k`)
+          .transition().delay(i * 200 + 600).duration(300).attr('opacity', 1);
+
+        // Tooltip
+        g.append('rect').attr('x', cx).attr('y', y(c.total)).attr('width', bw).attr('height', innerH - y(c.total))
+          .attr('fill', 'transparent')
+          .append('title').text(`Contrato ${i + 1}: €${c.individual.toLocaleString('es-ES')}\nAcumulado: €${c.total.toLocaleString('es-ES')}\n${c.objeto}`);
+      });
+
+      // Y axis
+      g.append('g')
+        .call(d3.axisLeft(y).ticks(5).tickFormat(d => '€' + (d / 1000).toFixed(0) + 'k'))
+        .call(gg => gg.selectAll('text').attr('fill', 'var(--text-secondary)').attr('font-size', 9).attr('font-family', 'var(--font-mono)'))
+        .call(gg => gg.select('.domain').attr('stroke', 'var(--border)'));
+
+      // X axis baseline
+      g.append('line').attr('x1', 0).attr('x2', innerW).attr('y1', innerH).attr('y2', innerH)
+        .attr('stroke', 'var(--border)');
+
+      // Axis labels
+      g.append('text').attr('x', innerW / 2).attr('y', innerH + 42)
+        .attr('text-anchor', 'middle').attr('fill', 'var(--text-muted)').attr('font-size', 9)
+        .text('Suma acumulada por contrato (orden de adjudicación)');
+    }
+
+    function initCaseCharts() {
+      const casosObs = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            drawGartnerChart();
+            drawMoypeChart();
+            drawSerintcomChart();
+            drawImplaserChart();
+            casosObs.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.1 });
+      const casos = document.getElementById('casos');
+      if (casos) casosObs.observe(casos);
+    }
+
+    // ── D3 Charts (B60-B62) ───────────────────────────────────────────
+    function drawHHISectorChart() {
+      const el = document.getElementById('chart-hhi-sector');
+      if (!el || el.querySelector('svg')) return;
+      const data = DATA.hhi_sector.slice(0, 14);
+      const w = el.clientWidth || 700;
+      const isMobile = w < 640;
+      const margin = isMobile
+        ? { top: 28, right: 50, bottom: 44, left: 150 }
+        : { top: 28, right: 90, bottom: 44, left: 240 };
+      const barH = 20, gap = 6;
+      const rowH = barH * 2 + gap + 10;
+      const innerH = data.length * rowH;
+      const h = innerH + margin.top + margin.bottom;
+      const innerW = w - margin.left - margin.right;
+
+      const xMax = Math.max(...data.map(d => d.hhi_mad), 0.35);
+      const x = d3.scaleLinear().domain([0, xMax]).range([0, innerW]);
+
+      const svg = d3.select(el).append('svg').attr('width', w).attr('height', h);
+      const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
+
+      // Subtitle
+      svg.append('text').attr('x', margin.left).attr('y', 14)
+        .attr('fill', 'var(--text-muted)').attr('font-size', 10)
+        .text('Índice HHI por sector CPV · ordenado por ratio Madrid/Barcelona');
+
+      // EU threshold reference line at x=0.25 with label
+      const ref25 = x(0.25);
+      g.append('line').attr('x1', ref25).attr('x2', ref25).attr('y1', -6).attr('y2', innerH)
+        .attr('stroke', 'var(--alert)').attr('stroke-dasharray', '4 2').attr('stroke-width', 1).attr('opacity', 0.55);
+      g.append('text').attr('x', ref25 + 4).attr('y', -8)
+        .attr('fill', 'var(--alert)').attr('font-size', 9).attr('opacity', 0.75)
+        .text('Umbral 0,25 (DoJ/UE)');
+
+      const labelMaxLen = isMobile ? 18 : 32;
+      data.forEach((d, i) => {
+        const y = i * rowH;
+        const isTop5 = i < 5;
+
+        // Sector label (left)
+        g.append('text').attr('x', -10).attr('y', y + barH)
+          .attr('text-anchor', 'end').attr('fill', isTop5 ? 'var(--text-primary)' : 'var(--text-secondary)')
+          .attr('font-size', 11).attr('dominant-baseline', 'middle')
+          .text(d.desc.length > labelMaxLen ? d.desc.substring(0, labelMaxLen - 1) + '…' : d.desc);
+
+        // Madrid bar
+        const madBar = g.append('rect').attr('x', 0).attr('y', y).attr('height', barH)
+          .attr('fill', 'var(--madrid)').attr('rx', 2).attr('opacity', isTop5 ? 0.92 : 0.55)
+          .attr('width', 0);
+        madBar.transition().delay(i * 50).duration(750).ease(d3.easeCubicOut).attr('width', Math.max(x(d.hhi_mad), 1));
+
+        // Madrid value label (inside bar if wide enough, else outside)
+        const madW = x(d.hhi_mad);
+        g.append('text').attr('x', madW > 50 ? madW - 6 : madW + 4)
+          .attr('y', y + barH / 2)
+          .attr('text-anchor', madW > 50 ? 'end' : 'start')
+          .attr('fill', madW > 50 ? '#0a0a0f' : 'var(--text-secondary)')
+          .attr('font-size', 10).attr('font-weight', 600).attr('font-family', 'var(--font-mono)')
+          .attr('dominant-baseline', 'middle').attr('opacity', 0)
+          .text(d.hhi_mad.toFixed(3))
+          .transition().delay(i * 50 + 750).duration(250).attr('opacity', 1);
+
+        // Barcelona bar (thinner)
+        const bcnH = Math.max(barH * 0.72, 9);
+        const bcnBar = g.append('rect').attr('x', 0).attr('y', y + barH + 2).attr('height', bcnH)
+          .attr('fill', 'var(--barcelona)').attr('rx', 2).attr('opacity', isTop5 ? 0.82 : 0.45)
+          .attr('width', 0);
+        bcnBar.transition().delay(i * 50 + 80).duration(750).ease(d3.easeCubicOut).attr('width', Math.max(x(d.hhi_bcn), 1));
+
+        // Barcelona value label (always outside since values are tiny)
+        g.append('text').attr('x', x(d.hhi_bcn) + 4)
+          .attr('y', y + barH + 2 + bcnH / 2)
+          .attr('fill', 'var(--text-muted)')
+          .attr('font-size', 9).attr('font-family', 'var(--font-mono)')
+          .attr('dominant-baseline', 'middle').attr('opacity', 0)
+          .text(d.hhi_bcn.toFixed(3))
+          .transition().delay(i * 50 + 830).duration(250).attr('opacity', 1);
+
+        // Ratio label (right side, top5 only)
+        if (isTop5) {
+          g.append('text').attr('x', innerW + 6).attr('y', y + barH)
+            .attr('fill', 'var(--accent)').attr('font-size', 12).attr('font-weight', '700')
+            .attr('dominant-baseline', 'middle').attr('opacity', 0)
+            .text(d.ratio + '×')
+            .transition().delay(i * 50 + 950).duration(300).attr('opacity', 1);
+        }
+      });
+
+      // X axis with ticks
+      const ticks = [0, 0.1, 0.25, 0.5];
+      if (xMax > 0.5) ticks.push(Math.ceil(xMax * 10) / 10);
+      g.append('g').attr('transform', `translate(0,${innerH + 4})`)
+        .call(d3.axisBottom(x).tickValues(ticks).tickFormat(d3.format('.2f')))
+        .call(gg => gg.selectAll('text').attr('fill', 'var(--text-secondary)').attr('font-size', 10).attr('font-family', 'var(--font-mono)'))
+        .call(gg => gg.select('.domain').attr('stroke', 'var(--border)'))
+        .call(gg => gg.selectAll('.tick line').attr('stroke', 'var(--border)'));
+
+      // X axis title
+      g.append('text').attr('x', innerW / 2).attr('y', innerH + 38)
+        .attr('text-anchor', 'middle').attr('fill', 'var(--text-muted)').attr('font-size', 10)
+        .text('Índice HHI (0 = competencia perfecta · 1 = monopolio)');
+
+      // Top header: "Ratio" column for top5
+      g.append('text').attr('x', innerW + 6).attr('y', -8)
+        .attr('fill', 'var(--text-muted)').attr('font-size', 9).attr('font-family', 'var(--font-mono)')
+        .text('RATIO');
+    }
+
+    function drawHHIOrgChart() {
+      const el = document.getElementById('chart-hhi-organos');
+      if (!el || el.querySelector('svg')) return;
+      const data = DATA.hhi_organo_top20;
+      const margin = { top: 16, right: 60, bottom: 36, left: 200 };
+      const w = el.clientWidth || 700;
+      const barH = 18, gap = 4;
+      const h = data.length * (barH + gap) + margin.top + margin.bottom;
+      const innerW = w - margin.left - margin.right;
+
+      const x = d3.scaleLinear().domain([0, d3.max(data, d => d.hhi)]).range([0, innerW]);
+      const svg = d3.select(el).append('svg').attr('width', w).attr('height', h);
+      const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
+
+      // threshold line at 0.25
+      const threshX = x(0.25);
+      g.append('line').attr('x1', threshX).attr('x2', threshX)
+        .attr('y1', 0).attr('y2', data.length * (barH + gap))
+        .attr('stroke', 'var(--alert)').attr('stroke-dasharray', '4 3').attr('stroke-width', 1);
+      g.append('text').attr('x', threshX + 4).attr('y', data.length * (barH + gap) + margin.bottom - 6)
+        .attr('fill', 'var(--text-muted)').attr('font-size', 9).text('HHI >0,25 → altamente concentrado (umbral DoJ/UE)');
+
+      data.forEach((d, i) => {
+        const y = i * (barH + gap);
+        const isHigh = d.hhi > 0.25;
+        const label = d.organo.replace('COORDINADORA', 'COOR.').replace('DIRECTORA', 'DIR.').replace('DIRECTOR', 'DIR.').replace('GENERAL', 'GRAL.').substring(0, 30);
+        g.append('text').attr('x', -8).attr('y', y + barH / 2)
+          .attr('text-anchor', 'end').attr('fill', isHigh ? 'var(--alert)' : 'var(--text-muted)')
+          .attr('font-size', 10).attr('dominant-baseline', 'middle').text(label);
+        const bar = g.append('rect').attr('x', 0).attr('y', y).attr('height', barH)
+          .attr('fill', isHigh ? 'var(--alert)' : 'var(--madrid)').attr('rx', 2)
+          .attr('opacity', isHigh ? 0.7 : 0.5).attr('width', 0);
+        bar.transition().delay(i * 40).duration(700).ease(d3.easeCubicOut).attr('width', x(d.hhi));
+        if (isHigh) {
+          g.append('text').attr('x', x(d.hhi) + 4).attr('y', y + barH / 2)
+            .attr('fill', 'var(--alert)').attr('font-size', 10).attr('dominant-baseline', 'middle')
+            .text(d.hhi.toFixed(2));
+        }
+      });
+    }
+
+    function drawFracChart() {
+      const el = document.getElementById('chart-frac');
+      if (!el || el.querySelector('svg')) return;
+      const data = DATA.fraccionamiento_top30;
+      const margin = { top: 20, right: 20, bottom: 50, left: 60 };
+      const w = el.clientWidth || 700;
+      const h = 280;
+      const innerW = w - margin.left - margin.right;
+      const innerH = h - margin.top - margin.bottom;
+
+      const parseDate = d3.timeParse('%Y-%m-%d');
+      const dates = data.map(d => parseDate(d.fecha)).filter(Boolean);
+      const x = d3.scaleTime().domain(d3.extent(dates)).range([0, innerW]);
+      const y = d3.scaleLinear().domain([0, d3.max(data, d => d.exceso) * 1.1]).range([innerH, 0]);
+
+      const svg = d3.select(el).append('svg').attr('width', w).attr('height', h);
+      const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
+
+      // Grid
+      g.append('g').attr('class', 'grid')
+        .call(d3.axisLeft(y).ticks(4).tickSize(-innerW).tickFormat(''))
+        .call(gg => gg.selectAll('line').attr('stroke', 'var(--border)').attr('stroke-width', 0.5))
+        .call(gg => gg.select('.domain').remove());
+
+      // Points
+      data.forEach((d, i) => {
+        const cx = x(parseDate(d.fecha));
+        const cy = y(d.exceso);
+        const isObras = d.tipo === 'Obras';
+        const isAnnotated = ['B50776947', 'A78111549', '05341273Y'].includes(d.nif);
+        const circle = g.append('circle').attr('cx', cx).attr('cy', cy)
+          .attr('r', 0)
+          .attr('fill', isObras ? 'var(--alert)' : 'var(--accent)')
+          .attr('opacity', isAnnotated ? 0.95 : 0.55)
+          .attr('cursor', 'pointer');
+        circle.append('title').text(`${d.razon_social}\nExceso: €${d.exceso.toLocaleString('es-ES')}\n${d.tipo} · ${d.fecha}`);
+        circle.transition().delay(i * 30).duration(400).attr('r', isAnnotated ? 7 : 5);
+
+        if (isAnnotated) {
+          const shortName = d.razon_social.split(' ').slice(0, 2).join(' ');
+          g.append('text').attr('x', cx + 9).attr('y', cy + 4)
+            .attr('fill', 'var(--text-primary)').attr('font-size', 10).text(shortName);
+        }
+      });
+
+      // Axes
+      g.append('g').attr('transform', `translate(0,${innerH})`)
+        .call(d3.axisBottom(x).ticks(5).tickFormat(d3.timeFormat('%Y')))
+        .call(gg => gg.selectAll('text').attr('fill', 'var(--text-secondary)').attr('font-size', 10))
+        .call(gg => gg.select('.domain').attr('stroke', 'var(--border)'));
+      g.append('g')
+        .call(d3.axisLeft(y).ticks(4).tickFormat(d => '€' + (d/1000).toFixed(0) + 'k'))
+        .call(gg => gg.selectAll('text').attr('fill', 'var(--text-secondary)').attr('font-size', 10))
+        .call(gg => gg.select('.domain').attr('stroke', 'var(--border)'));
+
+      // Axis labels
+      g.append('text').attr('x', innerW / 2).attr('y', innerH + 42)
+        .attr('text-anchor', 'middle').attr('fill', 'var(--text-muted)').attr('font-size', 10).text('Fecha inicio ventana 30 días');
+      g.append('text').attr('transform', 'rotate(-90)').attr('x', -innerH / 2).attr('y', -50)
+        .attr('text-anchor', 'middle').attr('fill', 'var(--text-muted)').attr('font-size', 10).text('Suma 30 días − umbral LCSP (€)');
+
+      // Legend: obras vs servicios
+      const legendX = innerW - 150;
+      g.append('circle').attr('cx', legendX).attr('cy', 8).attr('r', 5).attr('fill', 'var(--alert)').attr('opacity', 0.8);
+      g.append('text').attr('x', legendX + 10).attr('y', 12).attr('fill', 'var(--text-secondary)').attr('font-size', 9).text('Obras (umbral €40.000)');
+      g.append('circle').attr('cx', legendX).attr('cy', 24).attr('r', 5).attr('fill', 'var(--accent)').attr('opacity', 0.8);
+      g.append('text').attr('x', legendX + 10).attr('y', 28).attr('fill', 'var(--text-secondary)').attr('font-size', 9).text('Servicios (umbral €15.000)');
+    }
+
+    function redrawCharts() {
+      ['chart-hhi-sector', 'chart-hhi-organos', 'chart-frac'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = '';
+      });
+      drawHHISectorChart();
+      drawHHIOrgChart();
+      drawFracChart();
+    }
+
+    function initCharts() {
+      const chartObs = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            drawHHISectorChart();
+            drawHHIOrgChart();
+            drawFracChart();
+            chartObs.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.1 });
+      const resultados = document.getElementById('resultados');
+      if (resultados) {
+        chartObs.observe(resultados);
+        const ro = new ResizeObserver(() => {
+          clearTimeout(window._chartDebounce);
+          window._chartDebounce = setTimeout(redrawCharts, 150);
+        });
+        ro.observe(resultados);
+      }
+    }
+
+    // ── Pipeline interactive (B50-B51) ────────────────────────────────
+    function activatePipeStep(idx) {
+      // Steps
+      document.querySelectorAll('.pipe-step').forEach((el, i) => {
+        el.classList.toggle('active', i === idx);
+      });
+      // SVG nodes
+      document.querySelectorAll('.pipe-node').forEach((el, i) => {
+        el.classList.toggle('pipe-active', i === idx);
+      });
+      // SVG lines: light up completed lines
+      ['pipe-line-01','pipe-line-12','pipe-line-23','pipe-line-34'].forEach((id, i) => {
+        const line = document.getElementById(id);
+        if (!line) return;
+        if (i < idx) {
+          line.style.stroke = 'var(--accent-dim)';
+          line.style.strokeDashoffset = '0';
+        } else {
+          line.style.stroke = '#2a2a3a';
+          line.style.strokeDashoffset = '60';
+        }
+      });
+      // HHI mini chart (step 2)
+      if (idx === 2) {
+        const top3 = DATA.hhi_organo_top20.slice(0, 3);
+        const chart = document.getElementById('pipe-hhi-chart');
+        if (chart && chart.children.length === 0) {
+          top3.forEach(d => {
+            const row = document.createElement('div');
+            row.className = 'pipe-hhi-bar-row';
+            const label = d.organo.replace('COORDINADORA', 'COOR.').replace('DIRECTORA', 'DIR.').replace('GENERAL', 'GRAL.').replace(' DE ', ' ').substring(0, 28);
+            row.innerHTML = `<div class="pipe-hhi-bar-label" title="${d.organo}">${label}</div><div class="pipe-hhi-bar-track"><div class="pipe-hhi-bar-fill" style="width:${(d.hhi * 100).toFixed(1)}%"></div></div><div class="pipe-hhi-bar-val">${d.hhi.toFixed(2)}</div>`;
+            chart.appendChild(row);
+            setTimeout(() => row.querySelector('.pipe-hhi-bar-fill').style.transform = 'scaleX(1)', 100);
+          });
+        }
+      }
+    }
+
+    function initPipeline() {
+      const steps = document.querySelectorAll('.pipe-step');
+      steps.forEach((el, i) => {
+        el.addEventListener('click', () => activatePipeStep(i));
+      });
+
+      // Auto-advance as user scrolls through #metodologia
+      const pipeSection = document.getElementById('metodologia');
+      if (!pipeSection) return;
+
+      const pipeScrollObs = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            let current = 0;
+            activatePipeStep(0);
+            const autoTimer = setInterval(() => {
+              current = (current + 1) % 5;
+              activatePipeStep(current);
+              if (current === 4) clearInterval(autoTimer);
+            }, 1200);
+          }
+        });
+      }, { threshold: 0.3 });
+      pipeScrollObs.observe(pipeSection);
+    }
+
+    // Counter init for hero section
+    const heroObserver = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          animateCounter(document.getElementById('cnt-contratos'), 15778, 1500);
+          // €109M counter
+          const cntImp = document.getElementById('cnt-importe');
+          animateCounter(cntImp, 109, 1500);
+          // 3.6x ratio counter
+          const cntRatio = document.getElementById('cnt-ratio');
+          const startR = performance.now();
+          (function tickR(now) {
+            const p = Math.min((now - startR) / 1500, 1);
+            const eased = p === 1 ? 1 : 1 - Math.pow(2, -10 * p);
+            cntRatio.textContent = (3.6 * eased).toFixed(1) + 'x';
+            if (p < 1) requestAnimationFrame(tickR);
+          })(performance.now());
+          heroObserver.disconnect();
+        }
+      });
+    }, { threshold: 0.3 });
+    const heroSection = document.getElementById('hero');
+    if (heroSection) heroObserver.observe(heroSection);
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initReveal();
+      updateProgress();
+      initPipeline();
+      initCharts();
+      initCaseCharts();
+    });
+  </script>
+</body>
+</html>

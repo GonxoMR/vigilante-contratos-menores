@@ -1,0 +1,1105 @@
+{
+  "stats": {
+    "madrid_contratos": 15778,
+    "madrid_importe": 109891395,
+    "barcelona_contratos": 62473,
+    "barcelona_importe": 201612404,
+    "hhi_mediana_madrid": 0.044,
+    "hhi_mediana_barcelona": 0.012,
+    "ratio_mediana": 3.6,
+    "alertas_fraccionamiento": 866,
+    "nifs_alertas": 279,
+    "anios": [
+      2023,
+      2024,
+      2025
+    ],
+    "madrid_por_ano": {
+      "2023": 5719,
+      "2024": 5535,
+      "2025": 4524
+    },
+    "cpv_cobertura_pct": 51.9,
+    "actualizado": "2026-04-28",
+    "periodo_label": "2023–2025 (3 años)"
+  },
+  "case_totals": {
+    "gartner_total": 527650.75,
+    "gartner_n": 4,
+    "gartner_incremento_pct": 75.9,
+    "moype_total": 711115.41,
+    "moype_n": 91,
+    "serintcom_total": 262701.05,
+    "serintcom_n": 18
+  },
+  "hhi_sector": [
+    {
+      "cpv": "34000000",
+      "desc": "Señalización vial",
+      "hhi_mad": 0.329,
+      "hhi_bcn": 0.0083,
+      "ratio": 39.8,
+      "n_mad": 10,
+      "n_bcn": 1059,
+      "importe_mad": 73148
+    },
+    {
+      "cpv": "72000000",
+      "desc": "Servicios de tecnologías de la información",
+      "hhi_mad": 0.1028,
+      "hhi_bcn": 0.0032,
+      "ratio": 31.97,
+      "n_mad": 141,
+      "n_bcn": 1444,
+      "importe_mad": 2264911
+    },
+    {
+      "cpv": "71000000",
+      "desc": "Coordinación de seguridad y salud en obras",
+      "hhi_mad": 0.0454,
+      "hhi_bcn": 0.0022,
+      "ratio": 20.48,
+      "n_mad": 48,
+      "n_bcn": 3586,
+      "importe_mad": 469251
+    },
+    {
+      "cpv": "22000000",
+      "desc": "Libros, publicaciones y prensa",
+      "hhi_mad": 0.1869,
+      "hhi_bcn": 0.0096,
+      "ratio": 19.49,
+      "n_mad": 43,
+      "n_bcn": 1132,
+      "importe_mad": 286889
+    },
+    {
+      "cpv": "64000000",
+      "desc": "Servicios de mensajería",
+      "hhi_mad": 0.2164,
+      "hhi_bcn": 0.0246,
+      "ratio": 8.79,
+      "n_mad": 14,
+      "n_bcn": 862,
+      "importe_mad": 139305
+    },
+    {
+      "cpv": "98000000",
+      "desc": "Servicios funerarios",
+      "hhi_mad": 0.0275,
+      "hhi_bcn": 0.0032,
+      "ratio": 8.48,
+      "n_mad": 47,
+      "n_bcn": 3497,
+      "importe_mad": 635513
+    },
+    {
+      "cpv": "79000000",
+      "desc": "Servicios empresariales y de gestión",
+      "hhi_mad": 0.0068,
+      "hhi_bcn": 0.001,
+      "ratio": 7.14,
+      "n_mad": 1027,
+      "n_bcn": 12276,
+      "importe_mad": 8498835
+    },
+    {
+      "cpv": "48000000",
+      "desc": "Paquetes de software y sistemas de información",
+      "hhi_mad": 0.053,
+      "hhi_bcn": 0.0096,
+      "ratio": 5.51,
+      "n_mad": 66,
+      "n_bcn": 543,
+      "importe_mad": 474858
+    },
+    {
+      "cpv": "32000000",
+      "desc": "Equipos de comunicación y telecomunicación",
+      "hhi_mad": 0.0565,
+      "hhi_bcn": 0.0103,
+      "ratio": 5.47,
+      "n_mad": 72,
+      "n_bcn": 1098,
+      "importe_mad": 729098
+    },
+    {
+      "cpv": "73000000",
+      "desc": "Servicios de investigación y desarrollo",
+      "hhi_mad": 0.1068,
+      "hhi_bcn": 0.0226,
+      "ratio": 4.73,
+      "n_mad": 14,
+      "n_bcn": 84,
+      "importe_mad": 131091
+    },
+    {
+      "cpv": "37000000",
+      "desc": "Artículos de deporte y equipamiento deportivo",
+      "hhi_mad": 0.0537,
+      "hhi_bcn": 0.0119,
+      "ratio": 4.51,
+      "n_mad": 421,
+      "n_bcn": 651,
+      "importe_mad": 2539171
+    },
+    {
+      "cpv": "39000000",
+      "desc": "Mobiliario de oficina",
+      "hhi_mad": 0.0377,
+      "hhi_bcn": 0.0095,
+      "ratio": 3.98,
+      "n_mad": 121,
+      "n_bcn": 2510,
+      "importe_mad": 707243
+    },
+    {
+      "cpv": "33000000",
+      "desc": "Equipamiento médico y de laboratorio",
+      "hhi_mad": 0.1022,
+      "hhi_bcn": 0.0275,
+      "ratio": 3.71,
+      "n_mad": 49,
+      "n_bcn": 384,
+      "importe_mad": 430305
+    },
+    {
+      "cpv": "55000000",
+      "desc": "Servicios de catering",
+      "hhi_mad": 0.0584,
+      "hhi_bcn": 0.0166,
+      "ratio": 3.51,
+      "n_mad": 111,
+      "n_bcn": 817,
+      "importe_mad": 433857
+    },
+    {
+      "cpv": "30000000",
+      "desc": "Maquinaria y equipo de oficina e informática",
+      "hhi_mad": 0.063,
+      "hhi_bcn": 0.02,
+      "ratio": 3.15,
+      "n_mad": 385,
+      "n_bcn": 4410,
+      "importe_mad": 1935846
+    },
+    {
+      "cpv": "85000000",
+      "desc": "Servicios sanitarios",
+      "hhi_mad": 0.0182,
+      "hhi_bcn": 0.0097,
+      "ratio": 1.88,
+      "n_mad": 307,
+      "n_bcn": 463,
+      "importe_mad": 2053084
+    },
+    {
+      "cpv": "18000000",
+      "desc": "Artículos de confección y accesorios",
+      "hhi_mad": 0.0246,
+      "hhi_bcn": 0.0156,
+      "ratio": 1.57,
+      "n_mad": 187,
+      "n_bcn": 390,
+      "importe_mad": 1220404
+    },
+    {
+      "cpv": "80000000",
+      "desc": "Servicios de educación y formación",
+      "hhi_mad": 0.0053,
+      "hhi_bcn": 0.0035,
+      "ratio": 1.49,
+      "n_mad": 1014,
+      "n_bcn": 1520,
+      "importe_mad": 6507766
+    },
+    {
+      "cpv": "92000000",
+      "desc": "Servicios de artes escénicas y musicales",
+      "hhi_mad": 0.0014,
+      "hhi_bcn": 0.001,
+      "ratio": 1.48,
+      "n_mad": 2853,
+      "n_bcn": 7360,
+      "importe_mad": 16617445
+    },
+    {
+      "cpv": "77000000",
+      "desc": "Mantenimiento de zonas verdes",
+      "hhi_mad": 0.0401,
+      "hhi_bcn": 0.031,
+      "ratio": 1.29,
+      "n_mad": 36,
+      "n_bcn": 110,
+      "importe_mad": 372991
+    },
+    {
+      "cpv": "45000000",
+      "desc": "Obras de construcción",
+      "hhi_mad": 0.013,
+      "hhi_bcn": 0.0108,
+      "ratio": 1.2,
+      "n_mad": 446,
+      "n_bcn": 2380,
+      "importe_mad": 8141991
+    },
+    {
+      "cpv": "50000000",
+      "desc": "Servicios de reparación y mantenimiento",
+      "hhi_mad": 0.0057,
+      "hhi_bcn": 0.0059,
+      "ratio": 0.96,
+      "n_mad": 652,
+      "n_bcn": 6072,
+      "importe_mad": 4467942
+    },
+    {
+      "cpv": "90000000",
+      "desc": "Servicios de gestión medioambiental",
+      "hhi_mad": 0.0256,
+      "hhi_bcn": 0.03,
+      "ratio": 0.85,
+      "n_mad": 115,
+      "n_bcn": 663,
+      "importe_mad": 1019605
+    }
+  ],
+  "hhi_organo_top20": [
+    {
+      "organo": "COORDINADORA GENERAL DE LA ALCALDÍA",
+      "hhi": 0.8608,
+      "n": 19,
+      "importe": 524238,
+      "n_proveedores": 13
+    },
+    {
+      "organo": "DIRECTORA GENERAL DE POLÍTICA FINANCIERA",
+      "hhi": 0.4771,
+      "n": 6,
+      "importe": 83636,
+      "n_proveedores": 3
+    },
+    {
+      "organo": "DIRECTORA GENERAL DE GESTIÓN DEL PATRIMONIO",
+      "hhi": 0.2515,
+      "n": 7,
+      "importe": 61187,
+      "n_proveedores": 5
+    },
+    {
+      "organo": "DIRECTOR/A DE SEGURIDAD",
+      "hhi": 0.2378,
+      "n": 5,
+      "importe": 66705,
+      "n_proveedores": 5
+    },
+    {
+      "organo": "DIRECTOR GENERAL DE COORDINACIÓN TERRITORIAL Y  DESCONCENTRACIÓN",
+      "hhi": 0.2295,
+      "n": 9,
+      "importe": 83831,
+      "n_proveedores": 7
+    },
+    {
+      "organo": "DIRECTORA GENERAL DE POLÍTICAS DE VIVIENDA Y REHABILITACIÓN",
+      "hhi": 0.2273,
+      "n": 8,
+      "importe": 92000,
+      "n_proveedores": 5
+    },
+    {
+      "organo": "DIRECTOR/A DE RELACIONES INSTITUCIONALES",
+      "hhi": 0.2229,
+      "n": 6,
+      "importe": 77259,
+      "n_proveedores": 6
+    },
+    {
+      "organo": "BAJA_2023_ELECC_MUNICIPALES COORDINADORA GENERAL DE DISTRITOS, TRANSPARENCIA Y PARTICIPACIÓN CIUDADANA",
+      "hhi": 0.2161,
+      "n": 8,
+      "importe": 100084,
+      "n_proveedores": 6
+    },
+    {
+      "organo": "DIRECTOR/A GENERAL DE RELACIONES INTERNACIONALES",
+      "hhi": 0.2028,
+      "n": 23,
+      "importe": 99560,
+      "n_proveedores": 18
+    },
+    {
+      "organo": "DIRECTOR GENERAL DEL INSTITUTO MUNICIPAL DE CONSUMO",
+      "hhi": 0.187,
+      "n": 10,
+      "importe": 54919,
+      "n_proveedores": 9
+    },
+    {
+      "organo": "DIRECTOR/A DE COMUNICACIÓN, MARKETING Y DIGITALIZACIÓN",
+      "hhi": 0.1857,
+      "n": 16,
+      "importe": 77312,
+      "n_proveedores": 11
+    },
+    {
+      "organo": "BAJA_2023_ELEC_MUN_COORDINADOR GENERAL DE ECONOMÍA, COMERCIO, CONSUMO Y PARTENARIADO",
+      "hhi": 0.1811,
+      "n": 7,
+      "importe": 81757,
+      "n_proveedores": 6
+    },
+    {
+      "organo": "BAJA C.O. 2023 DIRECTOR GENERAL DE COOPERACIÓN Y CIUDADANÍA GLOBAL",
+      "hhi": 0.1739,
+      "n": 8,
+      "importe": 73374,
+      "n_proveedores": 7
+    },
+    {
+      "organo": "SECRETARIO GENERAL DEL PLENO",
+      "hhi": 0.164,
+      "n": 113,
+      "importe": 328631,
+      "n_proveedores": 17
+    },
+    {
+      "organo": "BAJA_2023_ELEC_MUN_DIRECTORA GENERAL DE COMERCIO Y HOSTELERÍA",
+      "hhi": 0.151,
+      "n": 10,
+      "importe": 87449,
+      "n_proveedores": 10
+    },
+    {
+      "organo": "BAJA_2023_ELEC  MUN_SECRETARIO GENERAL TÉCNICO DEL ÁREA DE GOBIERNO DE MEDIO AMBIENTE Y MOVILIDAD",
+      "hhi": 0.1482,
+      "n": 9,
+      "importe": 68312,
+      "n_proveedores": 8
+    },
+    {
+      "organo": "BAJA_2023_ELEC_MUN_SECRETARIA GENERAL TÉCNICA DEL ÁREA DE GOBIERNO DE DESARROLLO URBANO",
+      "hhi": 0.1443,
+      "n": 13,
+      "importe": 86321,
+      "n_proveedores": 12
+    },
+    {
+      "organo": "TITULAR DEL ÁREA DELEGADA DE TURISMO",
+      "hhi": 0.1436,
+      "n": 12,
+      "importe": 89656,
+      "n_proveedores": 12
+    },
+    {
+      "organo": "DIRECTOR GENERAL DE CONSERVACIÓN DE VÍAS PÚBLICAS",
+      "hhi": 0.1336,
+      "n": 10,
+      "importe": 119049,
+      "n_proveedores": 9
+    },
+    {
+      "organo": "BAJA_2023_ELEC_MUN_DIRECTOR GENERAL DE INNOVACIÓN Y EMPRENDIMIENTO",
+      "hhi": 0.1178,
+      "n": 24,
+      "importe": 193621,
+      "n_proveedores": 21
+    }
+  ],
+  "fraccionamiento_top30": [
+    {
+      "nif": "B50776947",
+      "razon_social": "IMPLASER 99,S.L.",
+      "tipo": "Obras",
+      "organo": "COORDINADOR DEL DISTRITO DE MONCLOA-ARAVACA",
+      "fecha": "2023-12-19",
+      "n_contratos": 5,
+      "suma_sin_iva": 145940,
+      "umbral": 40000,
+      "exceso": 105940
+    },
+    {
+      "nif": "A78111549",
+      "razon_social": "MOYPE SPORT SA",
+      "tipo": "Suministros",
+      "organo": "COORDINADOR DEL DISTRITO DE MONCLOA-ARAVACA",
+      "fecha": "2025-10-09",
+      "n_contratos": 11,
+      "suma_sin_iva": 98566,
+      "umbral": 15000,
+      "exceso": 83566
+    },
+    {
+      "nif": "B80345721",
+      "razon_social": "J C MADRID DEPORTE Y CULTURA S.L.",
+      "tipo": "Servicios",
+      "organo": "COORDINADORA DEL DISTRITO DE CENTRO",
+      "fecha": "2024-11-06",
+      "n_contratos": 8,
+      "suma_sin_iva": 89516,
+      "umbral": 15000,
+      "exceso": 74516
+    },
+    {
+      "nif": "A58417346",
+      "razon_social": "Aranzadi La Ley, S.A.U.",
+      "tipo": "Servicios",
+      "organo": "DIRECTOR GENERAL DE BIBLIOTECAS, ARCHIVOS Y MUSEOS ",
+      "fecha": "2025-12-15",
+      "n_contratos": 2,
+      "suma_sin_iva": 87868,
+      "umbral": 15000,
+      "exceso": 72868
+    },
+    {
+      "nif": "B28281095",
+      "razon_social": "SERRAZAR, S.L.",
+      "tipo": "Obras",
+      "organo": "GERENTE MADRID SALUD",
+      "fecha": "2024-06-13",
+      "n_contratos": 3,
+      "suma_sin_iva": 111360,
+      "umbral": 40000,
+      "exceso": 71360
+    },
+    {
+      "nif": "A78111549",
+      "razon_social": "MOYPE SPORT SA",
+      "tipo": "Suministros",
+      "organo": "COORDINADORA DEL DISTRITO DE VILLAVERDE",
+      "fecha": "2025-10-13",
+      "n_contratos": 10,
+      "suma_sin_iva": 83849,
+      "umbral": 15000,
+      "exceso": 68849
+    },
+    {
+      "nif": "A78111549",
+      "razon_social": "MOYPE SPORT SA",
+      "tipo": "Suministros",
+      "organo": "COORDINADOR DEL DISTRITO DE BARAJAS",
+      "fecha": "2024-10-15",
+      "n_contratos": 11,
+      "suma_sin_iva": 75024,
+      "umbral": 15000,
+      "exceso": 60024
+    },
+    {
+      "nif": "A79102331",
+      "razon_social": "UNIDAD EDITORIAL; S.A.",
+      "tipo": "Suministros",
+      "organo": "COORDINADORA GENERAL DE CULTURA",
+      "fecha": "2025-12-16",
+      "n_contratos": 2,
+      "suma_sin_iva": 74456,
+      "umbral": 15000,
+      "exceso": 59456
+    },
+    {
+      "nif": "A78111549",
+      "razon_social": "MOYPE SPORT SA",
+      "tipo": "Suministros",
+      "organo": "COORDINADOR DEL DISTRITO DE TETUÁN",
+      "fecha": "2024-10-24",
+      "n_contratos": 9,
+      "suma_sin_iva": 73578,
+      "umbral": 15000,
+      "exceso": 58578
+    },
+    {
+      "nif": "B59416479",
+      "razon_social": "HARTFORD, S.L.",
+      "tipo": "Servicios",
+      "organo": "COORDINADORA DEL DISTRITO DE CENTRO",
+      "fecha": "2024-10-23",
+      "n_contratos": 6,
+      "suma_sin_iva": 73428,
+      "umbral": 15000,
+      "exceso": 58428
+    },
+    {
+      "nif": "B87522702",
+      "razon_social": "GESTIÓN INTEGRAL ALDIBA S.L.",
+      "tipo": "Obras",
+      "organo": "COORDINADOR DEL DISTRITO DE MONCLOA-ARAVACA",
+      "fecha": "2024-07-03",
+      "n_contratos": 3,
+      "suma_sin_iva": 98357,
+      "umbral": 40000,
+      "exceso": 58357
+    },
+    {
+      "nif": "A78111549",
+      "razon_social": "MOYPE SPORT SA",
+      "tipo": "Suministros",
+      "organo": "COORDINADORA DEL DISTRITO DE PUENTE DE VALLECAS",
+      "fecha": "2025-10-16",
+      "n_contratos": 9,
+      "suma_sin_iva": 70369,
+      "umbral": 15000,
+      "exceso": 55369
+    },
+    {
+      "nif": "A79816690",
+      "razon_social": "GLOBAL MEDIA & ENTERTAINMENT, S.A.U.",
+      "tipo": "Servicios",
+      "organo": "SECRETARIA GENERAL TÉCNICA DE POLÍTICAS DE VIVIENDA",
+      "fecha": "2024-02-22",
+      "n_contratos": 7,
+      "suma_sin_iva": 69427,
+      "umbral": 15000,
+      "exceso": 54427
+    },
+    {
+      "nif": "B84851278",
+      "razon_social": "GESTIÓN INTEGRAL DE OFICINAS, S.L.",
+      "tipo": "Suministros",
+      "organo": "DIRECTORA GENERAL DE EMPRENDIMIENTO",
+      "fecha": "2025-07-18",
+      "n_contratos": 7,
+      "suma_sin_iva": 68178,
+      "umbral": 15000,
+      "exceso": 53178
+    },
+    {
+      "nif": "B84851278",
+      "razon_social": "GESTIÓN INTEGRAL DE OFICINAS, S.L.",
+      "tipo": "Suministros",
+      "organo": "COORDINADORA DEL DISTRITO DE VILLAVERDE",
+      "fecha": "2025-10-15",
+      "n_contratos": 10,
+      "suma_sin_iva": 66239,
+      "umbral": 15000,
+      "exceso": 51239
+    },
+    {
+      "nif": "A79816690",
+      "razon_social": "GLOBAL MEDIA & ENTERTAINMENT, S.A.U.",
+      "tipo": "Servicios",
+      "organo": "CONSEJERO/A DELEGADO/A",
+      "fecha": "2024-02-28",
+      "n_contratos": 6,
+      "suma_sin_iva": 64677,
+      "umbral": 15000,
+      "exceso": 49677
+    },
+    {
+      "nif": "A78557808",
+      "razon_social": "DISTRIBUIDORA DE MATERIAL DE OFICINA, S.A.",
+      "tipo": "Suministros",
+      "organo": "COORDINADOR DEL DISTRITO DE FUENCARRAL-EL PARDO",
+      "fecha": "2024-03-18",
+      "n_contratos": 7,
+      "suma_sin_iva": 62321,
+      "umbral": 15000,
+      "exceso": 47321
+    },
+    {
+      "nif": "A78111549",
+      "razon_social": "MOYPE SPORT SA",
+      "tipo": "Suministros",
+      "organo": "COORDINADOR DEL DISTRITO DE SALAMANCA",
+      "fecha": "2025-10-17",
+      "n_contratos": 8,
+      "suma_sin_iva": 62011,
+      "umbral": 15000,
+      "exceso": 47011
+    },
+    {
+      "nif": "A78111549",
+      "razon_social": "MOYPE SPORT SA",
+      "tipo": "Suministros",
+      "organo": "COORDINADOR DEL DISTRITO DE TETUÁN",
+      "fecha": "2024-10-29",
+      "n_contratos": 7,
+      "suma_sin_iva": 60425,
+      "umbral": 15000,
+      "exceso": 45425
+    },
+    {
+      "nif": "B81650137",
+      "razon_social": "YEIYEBA, S.L.",
+      "tipo": "Servicios",
+      "organo": "COORDINADOR DEL DISTRITO DE CIUDAD LINEAL",
+      "fecha": "2024-05-07",
+      "n_contratos": 6,
+      "suma_sin_iva": 60048,
+      "umbral": 15000,
+      "exceso": 45048
+    },
+    {
+      "nif": "A79816690",
+      "razon_social": "GLOBAL MEDIA & ENTERTAINMENT, S.A.U.",
+      "tipo": "Servicios",
+      "organo": "DIRECTOR GENERAL DE PLANIFICACIÓN DE RECURSOS HUMANOS",
+      "fecha": "2024-02-29",
+      "n_contratos": 5,
+      "suma_sin_iva": 59927,
+      "umbral": 15000,
+      "exceso": 44927
+    },
+    {
+      "nif": "B87083200",
+      "razon_social": "DISORDER EVENTS S.L.",
+      "tipo": "Servicios",
+      "organo": "COORDINADOR DEL DISTRITO DE MORATALAZ",
+      "fecha": "2025-05-13",
+      "n_contratos": 5,
+      "suma_sin_iva": 59642,
+      "umbral": 15000,
+      "exceso": 44642
+    },
+    {
+      "nif": "B28475002",
+      "razon_social": "COMERCIAL DE SUMINISTROS PARA LA INFORMATICA S.L.",
+      "tipo": "Suministros",
+      "organo": "COORDINADOR DEL DISTRITO DE LATINA",
+      "fecha": "2023-02-03",
+      "n_contratos": 10,
+      "suma_sin_iva": 59512,
+      "umbral": 15000,
+      "exceso": 44512
+    },
+    {
+      "nif": "B88454962",
+      "razon_social": "EVENTOS INFIMA,S.L.",
+      "tipo": "Servicios",
+      "organo": "COORDINADOR DEL DISTRITO DE TETUÁN",
+      "fecha": "2024-03-14",
+      "n_contratos": 6,
+      "suma_sin_iva": 59355,
+      "umbral": 15000,
+      "exceso": 44355
+    },
+    {
+      "nif": "A58417346",
+      "razon_social": "LA LEY SOLUCIONES LEGALES, S.A.",
+      "tipo": "Servicios",
+      "organo": "DIRECTORA DE LA AGENCIA TRIBUTARIA MADRID",
+      "fecha": "2023-11-14",
+      "n_contratos": 2,
+      "suma_sin_iva": 59173,
+      "umbral": 15000,
+      "exceso": 44173
+    },
+    {
+      "nif": "A28855260",
+      "razon_social": "INETUM ESPAÑA, S.A.",
+      "tipo": "Servicios",
+      "organo": "DIRECTOR GENERAL DE PLANIFICACIÓN DE RECURSOS HUMANOS",
+      "fecha": "2025-05-30",
+      "n_contratos": 9,
+      "suma_sin_iva": 57761,
+      "umbral": 15000,
+      "exceso": 42761
+    },
+    {
+      "nif": "A78557808",
+      "razon_social": "DISTRIBUIDORA DE MATERIAL DE OFICINA, S.A.",
+      "tipo": "Suministros",
+      "organo": "COORDINADOR DEL DISTRITO DE FUENCARRAL-EL PARDO",
+      "fecha": "2023-02-21",
+      "n_contratos": 11,
+      "suma_sin_iva": 57665,
+      "umbral": 15000,
+      "exceso": 42665
+    },
+    {
+      "nif": "B84851278",
+      "razon_social": "GESTIÓN INTEGRAL DE OFICINAS, S.L.",
+      "tipo": "Suministros",
+      "organo": "COORDINADOR DEL DISTRITO DE CHAMBERÍ",
+      "fecha": "2025-07-29",
+      "n_contratos": 6,
+      "suma_sin_iva": 56539,
+      "umbral": 15000,
+      "exceso": 41539
+    },
+    {
+      "nif": "A28855260",
+      "razon_social": "INETUM ESPAÑA, S.A.",
+      "tipo": "Servicios",
+      "organo": "DIRECTOR GENERAL DE PLANIFICACIÓN DE RECURSOS HUMANOS",
+      "fecha": "2024-02-14",
+      "n_contratos": 9,
+      "suma_sin_iva": 56445,
+      "umbral": 15000,
+      "exceso": 41445
+    },
+    {
+      "nif": "A79816690",
+      "razon_social": "GLOBAL MEDIA Y ENTERTAINMENT SPAIN, S.A.U.",
+      "tipo": "Servicios",
+      "organo": "COORDINADOR DEL DISTRITO DE TETUÁN",
+      "fecha": "2025-03-10",
+      "n_contratos": 5,
+      "suma_sin_iva": 56238,
+      "umbral": 15000,
+      "exceso": 41238
+    }
+  ],
+  "gartner": [
+    {
+      "fecha": "2023-03-22",
+      "importe": 127655,
+      "organo": "COORDINADORA GENERAL DE LA ALCALDÍA",
+      "ano": 2023,
+      "objeto": "SUSCRIPCIÓN A LA BASE DE DATOS GARTNER DE CONOCIMIENTO ESTRATÉGICO EN MATERIAS DE TECNOLOGÍAS DE LA INFORMACIÓN Y LAS CO"
+    },
+    {
+      "fecha": "2024-03-06",
+      "importe": 134038,
+      "organo": "COORDINADORA GENERAL DE LA ALCALDÍA",
+      "ano": 2024,
+      "objeto": "CONTRATO PRIVADO PARA LA SUSCRIPCIÓN A LA BASE DE DATOS GARTNER DE CONOCIMIENTO ESTRATÉGICO EN MATERIAS DE TECNOLOGÍAS D"
+    },
+    {
+      "fecha": "2024-09-26",
+      "importe": 41442,
+      "organo": "DIRECTOR GENERAL DE LA OFICINA DIGITAL",
+      "ano": 2024,
+      "objeto": "SUSCRIPCIÓN A LA BASE DE DATOS GARTNER DE CONOCIMIENTO ESTRATÉGICO EN MATERIAS DE CYBERSEGURIDAD"
+    },
+    {
+      "fecha": "2025-03-24",
+      "importe": 224516,
+      "organo": "COORDINADORA GENERAL DE LA ALCALDÍA",
+      "ano": 2025,
+      "objeto": "SUSCRIPCIÓN A LAS BASES DE DATOS GARTNER: DE CONOCIMIENTO ESTRATÉGICO EN MATERIAS DE TECNOLOGÍAS DE LA INFORMACIÓN Y LAS"
+    }
+  ],
+  "moype_distritos": [
+    {
+      "distrito": "LATINA",
+      "organo": "COORDINADOR DEL DISTRITO DE LATINA",
+      "n_contratos": 13,
+      "importe": 143457
+    },
+    {
+      "distrito": "MORATALAZ",
+      "organo": "COORDINADOR DEL DISTRITO DE MORATALAZ",
+      "n_contratos": 8,
+      "importe": 91665
+    },
+    {
+      "distrito": "TETUÁN",
+      "organo": "COORDINADOR DEL DISTRITO DE TETUÁN",
+      "n_contratos": 14,
+      "importe": 63060
+    },
+    {
+      "distrito": "FUENCARRAL-EL PARDO",
+      "organo": "COORDINADOR DEL DISTRITO DE FUENCARRAL-EL PARDO",
+      "n_contratos": 5,
+      "importe": 63035
+    },
+    {
+      "distrito": "BARAJAS",
+      "organo": "COORDINADOR DEL DISTRITO DE BARAJAS",
+      "n_contratos": 10,
+      "importe": 61006
+    },
+    {
+      "distrito": "SALAMANCA",
+      "organo": "COORDINADOR DEL DISTRITO DE SALAMANCA",
+      "n_contratos": 6,
+      "importe": 53480
+    },
+    {
+      "distrito": "VILLAVERDE",
+      "organo": "COORDINADORA DEL DISTRITO DE VILLAVERDE",
+      "n_contratos": 7,
+      "importe": 42063
+    },
+    {
+      "distrito": "USERA",
+      "organo": "COORDINADOR DEL DISTRITO DE USERA",
+      "n_contratos": 4,
+      "importe": 37824
+    },
+    {
+      "distrito": "ARGANZUELA",
+      "organo": "COORDINADOR DEL DISTRITO DE ARGANZUELA",
+      "n_contratos": 3,
+      "importe": 26413
+    },
+    {
+      "distrito": "MONCLOA-ARAVACA",
+      "organo": "COORDINADOR DEL DISTRITO DE MONCLOA-ARAVACA",
+      "n_contratos": 2,
+      "importe": 19256
+    },
+    {
+      "distrito": "HORTALEZA",
+      "organo": "COORDINADOR DEL DISTRITO DE HORTALEZA",
+      "n_contratos": 1,
+      "importe": 17732
+    },
+    {
+      "distrito": "VICÁLVARO",
+      "organo": "COORDINADORA DEL DISTRITO DE VICÁLVARO",
+      "n_contratos": 1,
+      "importe": 16630
+    },
+    {
+      "distrito": "CHAMARTÍN",
+      "organo": "COORDINADOR DEL DISTRITO DE CHAMARTÍN",
+      "n_contratos": 2,
+      "importe": 12824
+    },
+    {
+      "distrito": "CHAMARTÍN",
+      "organo": "COORDINADORA DEL DISTRITO DE CHAMARTÍN",
+      "n_contratos": 1,
+      "importe": 12764
+    },
+    {
+      "distrito": "CARABANCHEL",
+      "organo": "COORDINADORA DEL DISTRITO DE CARABANCHEL",
+      "n_contratos": 1,
+      "importe": 12188
+    },
+    {
+      "distrito": "PUENTE DE VALLECAS",
+      "organo": "COORDINADORA DEL DISTRITO DE PUENTE DE VALLECAS",
+      "n_contratos": 1,
+      "importe": 10113
+    },
+    {
+      "distrito": "SAN BLAS - CANILLEJAS",
+      "organo": "COORDINADOR DEL DISTRITO DE SAN BLAS - CANILLEJAS",
+      "n_contratos": 2,
+      "importe": 8023
+    },
+    {
+      "distrito": "VILLA DE VALLECAS",
+      "organo": "COORDINADORA DEL DISTRITO DE VILLA DE VALLECAS",
+      "n_contratos": 2,
+      "importe": 6568
+    },
+    {
+      "distrito": "DIRECTOR GENERAL DE DEPORTE",
+      "organo": "DIRECTOR GENERAL DE DEPORTE",
+      "n_contratos": 1,
+      "importe": 5661
+    },
+    {
+      "distrito": "CIUDAD LINEAL",
+      "organo": "COORDINADOR DEL DISTRITO DE CIUDAD LINEAL",
+      "n_contratos": 1,
+      "importe": 4580
+    },
+    {
+      "distrito": "DIRECTOR/A DE DEPORTES",
+      "organo": "DIRECTOR/A DE DEPORTES",
+      "n_contratos": 4,
+      "importe": 3869
+    },
+    {
+      "distrito": "DIRECTORA GENERAL DE INCLUSIÓN SOCIAL Y COOPERACIÓN AL DESARROLLO",
+      "organo": "DIRECTORA GENERAL DE INCLUSIÓN SOCIAL Y COOPERACIÓN AL DESARROLLO",
+      "n_contratos": 1,
+      "importe": 543
+    },
+    {
+      "distrito": "DIRECTOR GENERAL DE POLICÍA MUNICIPAL",
+      "organo": "DIRECTOR GENERAL DE POLICÍA MUNICIPAL",
+      "n_contratos": 2,
+      "importe": 285
+    }
+  ],
+  "moype_total": 711115.41,
+  "serintcom": [
+    {
+      "fecha": "2023-03-27",
+      "importe_sin_iva": 14856.0,
+      "tipo": "Servicios",
+      "umbral": 15000,
+      "objeto": "COLABORAR EN LA GESTIÓN DE LAS REDES SOCIALES DEL ORGANISMO AUTÓNOMO MADRID SALU",
+      "supera_umbral": false
+    },
+    {
+      "fecha": "2023-07-20",
+      "importe_sin_iva": 14841.2,
+      "tipo": "Suministros",
+      "umbral": 15000,
+      "objeto": "SUMINISTRO PARA LA ADQUISICIÓN DE OBJETOS DE MERCHANDISING PARA EL ORGANISMO AUT",
+      "supera_umbral": false
+    },
+    {
+      "fecha": "2023-11-28",
+      "importe_sin_iva": 14850.0,
+      "tipo": "Servicios",
+      "umbral": 15000,
+      "objeto": "TRABAJO TÉCNICO DE APOYO EN LA PRODUCCIÓN Y GESTIÓN DE CONTENIDOS AUDIOVISUALES ",
+      "supera_umbral": false
+    },
+    {
+      "fecha": "2023-12-15",
+      "importe_sin_iva": 3969.0,
+      "tipo": "Suministros",
+      "umbral": 15000,
+      "objeto": "SUMINISTRO DE BOLSAS SERIGRAFIADAS CON FIN PUBLICITARIO DE LOS DIFERENTES SERVIC",
+      "supera_umbral": false
+    },
+    {
+      "fecha": "2024-02-14",
+      "importe_sin_iva": 14750.0,
+      "tipo": "Suministros",
+      "umbral": 15000,
+      "objeto": "SUMINISTRO DE HERRAMIENTAS PARA POSICIONAMIENTO WEB, GESTIÓN DE REDES SOCIALES, ",
+      "supera_umbral": false
+    },
+    {
+      "fecha": "2024-03-13",
+      "importe_sin_iva": 14856.0,
+      "tipo": "Servicios",
+      "umbral": 15000,
+      "objeto": "COLABORAR EN LA GESTIÓN DE LAS REDES SOCIALES DEL ORGANISMO AUTÓNOMO MADRID SALU",
+      "supera_umbral": false
+    },
+    {
+      "fecha": "2024-04-09",
+      "importe_sin_iva": 2975.0,
+      "tipo": "Servicios",
+      "umbral": 15000,
+      "objeto": "REALIZACIÓN DE UN PROYECTO QUE RECOJA LAS NECESIDADES DE SEÑALÉTICA DEL ORGANISM",
+      "supera_umbral": false
+    },
+    {
+      "fecha": "2024-06-21",
+      "importe_sin_iva": 14575.0,
+      "tipo": "Servicios",
+      "umbral": 15000,
+      "objeto": "TRABAJO TÉCNICO DE EDICIÓN Y POST PRODUCCIÓN DE PIEZAS AUDIOVISUALES DE LA SUBDI",
+      "supera_umbral": false
+    },
+    {
+      "fecha": "2024-08-06",
+      "importe_sin_iva": 5595.0,
+      "tipo": "Suministros",
+      "umbral": 15000,
+      "objeto": "SUMINISTRO DE MATERIALES DE APOYO A LAS ACTIVIDADES DE COMUNICACIÓN INTERNA",
+      "supera_umbral": false
+    },
+    {
+      "fecha": "2024-09-24",
+      "importe_sin_iva": 425.6,
+      "tipo": "Suministros",
+      "umbral": 15000,
+      "objeto": "SUMINISTRO DE CINTAS (LANDYARDS) CON LA IMAGEN CORPORATIVA PARA LA DIRECCIÓN GEN",
+      "supera_umbral": false
+    },
+    {
+      "fecha": "2024-10-22",
+      "importe_sin_iva": 14850.0,
+      "tipo": "Servicios",
+      "umbral": 15000,
+      "objeto": "TRABAJO TÉCNICO DE APOYO EN LA PRODUCCIÓN Y GESTIÓN DE CONTENIDOS AUDIOVISUALES ",
+      "supera_umbral": false
+    },
+    {
+      "fecha": "2024-12-05",
+      "importe_sin_iva": 14800.0,
+      "tipo": "Suministros",
+      "umbral": 15000,
+      "objeto": "SUMINISTRO DE HERRAMIENTAS PARA POSICIONAMIENTO WEB, GESTIÓN DE REDES SOCIALES, ",
+      "supera_umbral": false
+    },
+    {
+      "fecha": "2024-12-12",
+      "importe_sin_iva": 14990.0,
+      "tipo": "Suministros",
+      "umbral": 15000,
+      "objeto": "SUMINISTRO DE LICENCIAS ADOBE CREATIVE CLOUD PARA MADRID SALUD, A TRAVÉS DE LA I",
+      "supera_umbral": false
+    },
+    {
+      "fecha": "2025-04-29",
+      "importe_sin_iva": 14925.0,
+      "tipo": "Suministros",
+      "umbral": 15000,
+      "objeto": "Suministro de materiales de apoyo específicos para el programa de Alimentación y",
+      "supera_umbral": false
+    },
+    {
+      "fecha": "2025-05-14",
+      "importe_sin_iva": 13920.0,
+      "tipo": "Servicios",
+      "umbral": 15000,
+      "objeto": "Servicio para colaborar en la gestión de las redes sociales del Organismo Autóno",
+      "supera_umbral": false
+    },
+    {
+      "fecha": "2025-06-27",
+      "importe_sin_iva": 12280.5,
+      "tipo": "Suministros",
+      "umbral": 15000,
+      "objeto": " Adquisición de objetos de materiales de apoyo a la Campaña de Madrid dermosalud",
+      "supera_umbral": false
+    },
+    {
+      "fecha": "2025-08-04",
+      "importe_sin_iva": 14800.0,
+      "tipo": "Servicios",
+      "umbral": 15000,
+      "objeto": "Servicio para la elaboración de contenidos audiovisuales sobre diferentes servic",
+      "supera_umbral": false
+    },
+    {
+      "fecha": "2025-10-17",
+      "importe_sin_iva": 14850.0,
+      "tipo": "Servicios",
+      "umbral": 15000,
+      "objeto": "Servicio para un trabajo técnico de apoyo en la producción y gestión de contenid",
+      "supera_umbral": false
+    }
+  ],
+  "implaser": [
+    {
+      "fecha": "2023-12-19",
+      "importe_sin_iva": 34377.02,
+      "importe_iva": 41596.19,
+      "tipo": "Obras",
+      "umbral": 40000,
+      "organo": "COORDINADOR DEL DISTRITO DE MONCLOA-ARAVACA",
+      "objeto": "CONTRATO MENOR DE OBRAS PARA LA ADECUACIÓN Y MEJORA DE LA ACCESIBILIDAD DEL CENT"
+    },
+    {
+      "fecha": "2023-12-19",
+      "importe_sin_iva": 23734.75,
+      "importe_iva": 28719.05,
+      "tipo": "Obras",
+      "umbral": 40000,
+      "organo": "COORDINADOR DEL DISTRITO DE MONCLOA-ARAVACA",
+      "objeto": "CONTRATO MENOR DE OBRAS PARA LA ADECUACIÓN Y MEJORA DE LA ACCESIBILIDAD INTERIOR"
+    },
+    {
+      "fecha": "2023-12-19",
+      "importe_sin_iva": 34286.11,
+      "importe_iva": 41486.19,
+      "tipo": "Obras",
+      "umbral": 40000,
+      "organo": "COORDINADOR DEL DISTRITO DE MONCLOA-ARAVACA",
+      "objeto": "CONTRATO MENOR DE OBRAS PARA LA ADECUACIÓN Y MEJORA DE LA ACCESIBILIDAD INTERIOR"
+    },
+    {
+      "fecha": "2023-12-19",
+      "importe_sin_iva": 19101.81,
+      "importe_iva": 23113.19,
+      "tipo": "Obras",
+      "umbral": 40000,
+      "organo": "COORDINADOR DEL DISTRITO DE MONCLOA-ARAVACA",
+      "objeto": "CONTRATO MENOR DE OBRAS PARA LA ADECUACIÓN Y MEJORA DE LA ACCESIBILIDAD INTERIOR"
+    },
+    {
+      "fecha": "2023-12-19",
+      "importe_sin_iva": 34440.53,
+      "importe_iva": 41673.04,
+      "tipo": "Obras",
+      "umbral": 40000,
+      "organo": "COORDINADOR DEL DISTRITO DE MONCLOA-ARAVACA",
+      "objeto": "CONTRATO MENOR DE OBRAS PARA LA MEJORA DE LA ACCESIBILIDAD INTERIOR DEL CENTRO M"
+    }
+  ]
+}
